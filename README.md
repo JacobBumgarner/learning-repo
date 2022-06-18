@@ -10,4 +10,4 @@ Please feel free to create issues in the resository if you find anything wrong w
 
 | Field | Method | Level | Date |
 | ----- | ------ | ----- | ---- | 
-| Statistics | [Principal Component Analysis] | From scratch | 06/18/2022 |
+| Statistics | [Principal Component Analysis](pca/pca.ipynb) | From scratch | 06/18/2022 |
