@@ -8,6 +8,6 @@ Please feel free to create issues in the resository if you find anything wrong w
 
 ## Learning History
 
-| Field | Method | Level | Date |
-| ----- | ------ | ----- | ---- | 
-| Statistics | [Principal Component Analysis](pca/pca.ipynb) | From scratch | 06/18/2022 |
+| Field | Method | Date |
+| ----- | ------ | ---- | 
+| Statistics | [Principal Component Analysis](pca/pca.ipynb) | 06/18/2022 |
