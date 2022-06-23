@@ -11,3 +11,4 @@ Please feel free to create issues in the resository if you find anything wrong w
 | Field | Method | Date |
 | ----- | ------ | ---- | 
 | Statistics | [Principal Component Analysis](pca/pca.ipynb) | 06/18/2022 |
+| Deep Learning| [Softmax](softmax/softmax.ipynb) | 06/23/2022 |
