@@ -1,4 +1,4 @@
-# Learning Lab
+# Learning Repo
 This is my public notebook hub where I learn about or reinforce my understanding of various statistical methods, machine learning algorithms, deep learning models, or image processing techniques.
 
 The easiest way that for me to learn or improve my understanding of topics is breaking them down to the basics and then teaching the concepts to others. [Richard Feynman](https://www.colorado.edu/artssciences-advising/resource-library/life-skills/the-feynman-technique-in-academic-coaching) really knew what he was talking about.
