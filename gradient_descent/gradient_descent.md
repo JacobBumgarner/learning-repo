@@ -1,5 +1,5 @@
 # Breaking it Down: Gradient Descent
-Exploring and visualizing the mathematical fundamentals of gradient descent.
+Exploring and visualizing the mathematical fundamentals of gradient descent with [Grad-Descent-Visualizer][gdv].
 
 https://gfycat.com/pitifulleftenglishpointer
 
