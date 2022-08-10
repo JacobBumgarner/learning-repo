@@ -28,7 +28,7 @@ The 'supervised' nature of logit models indicates that they require labeled data
 In this article, we will explore the fundamentals of logistic regression and build a model from scratch with NumPy. To learn by example, we'll train this model to predict whether adults have heart disease based on input health data. We'll conclude by creating a logit model with TensorFlow and comparing its results to our own.
 
 ### **2. Breaking Down Logistic Regression**
-Logistic regression models create probability labels (***Y***) for input data (***X***) by applying the following transformation:
+Logistic regression models create probability labels (***Y***) for input data (***X***) by applying the logistic function:
 
 ![](latex/logistic_regression%402x.png)
 
