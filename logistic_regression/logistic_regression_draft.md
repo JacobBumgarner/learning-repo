@@ -185,13 +185,7 @@ Now that we've built the model and prepared our dataset, let's train our model t
 
 We'll instantiate the model, train it with our `x_train` and `y_train` data, and we'll test it with the `x_test` and `y_test` data!
 
-
-
-
-
-
-
-
+https://gist.github.com/JacobBumgarner/b267213514e30c2a3e632a53fc3c5448
 
 
 

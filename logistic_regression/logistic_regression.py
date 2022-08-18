@@ -185,7 +185,7 @@ class LogisticRegression:
             print(f"Final model cost: {cost:0.2f}              ")
 
         self.fit = True
-        return np.array(costs), np.array(accuracies), np.array(weight_hist), np.array(bias_hist)
+        return np.array(costs), np.array(accuracies), np.array(weight_hist).T, np.array(bias_hist).T[0, 0]
 
     def predict(self, X) -> np.ndarray:
         """Predict the labels for a set of input data.

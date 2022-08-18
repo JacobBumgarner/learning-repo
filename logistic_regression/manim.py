@@ -1,8 +1,5 @@
 from manimlib import *
 
-# from manim import *
-
-# print(manimpango.list_fonts())
 points = np.array(
     [
         1.108084720644417,
@@ -84,6 +81,281 @@ points = np.array(
     ]
 )
 
+sorted_points = np.sort(points)
+
+
+class Sigmoid(Scene):
+    def construct(self):
+        # Construct the main scene components
+        self.create_left_column()
+        self.create_right_column()
+        self.group_page()
+
+        # Animate the scene
+        self.animate()
+        return
+
+    def animate(self):
+        # Animate the left column
+        self.play(Write(self.top_text))
+        self.play(FadeIn(self.equation[0:11]))
+        self.wait(0.5)
+        self.play(
+            TransformMatchingTex(self.equation[0:11].copy(), self.equation[11:18])
+        )
+        self.wait(0.5)
+        self.play(TransformMatchingTex(self.equation[11:18].copy(), self.equation[18:]))
+        self.wait(1)
+        self.play(TransformMatchingTex(self.equation[18:].copy(), self.definitions))
+
+        self.wait(1.5)
+        self.play(Write(self.line))
+
+        # Animate the right column
+        self.play(Write(self.graph), Write(self.number_line_group))
+
+        self.animate_dots_on_line()
+        self.wait(0.5)
+        self.animate_sigmoid_function()
+        self.animate_dots_to_sigmoid()
+
+        self.play(
+            FadeOut(self.number_line_group, DOWN),
+            self.graph.animate.shift(DOWN * 0.8),
+            self.sigmoid_graph.animate.shift(DOWN * 0.8),
+            *[dot.animate.shift(DOWN * 0.8) for dot in self.dots]
+        )
+
+        # Move the sigmoid-transformed data into their own groups
+        # self.animate_label_indicators()
+
+        self.animate_dots_to_groups()
+        self.wait(0.5)
+        # Fade the graph, add the "Disease" 
+        self.play(
+            FadeOut(self.graph),
+            FadeOut(self.sigmoid_graph),
+            *[dot.animate.shift(DOWN*3) for dot in self.dots],
+            self.positive_label_group.animate.shift(UP*1.5),
+            self.negative_label_group.animate.shift(UP*1.5)
+        )
+        
+        self.animate_prediction_text()
+        
+        self.wait(1)
+        self.play(*[FadeOut(item) for item in self.mobjects])
+        return
+    
+    def animate_prediction_text(self):
+        self.prediction_title = Text("Model Predictions:", font_size=42)
+        self.prediction_title.move_to(self.graph.get_center()).shift(UP*1.8)
+        
+        self.positive_prediction = Text("Heart Disease", font_size=32)
+        self.positive_prediction.move_to(self.positive_arrow.get_center()).shift(UP*2)
+        
+        self.negative_prediction = Text("No Heart Disease", font_size=32)
+        self.negative_prediction.move_to(self.negative_arrow.get_center()).shift(UP*2)
+
+        self.play(Write(self.prediction_title))
+        self.play(Write(self.negative_prediction))
+        self.play(Write(self.positive_prediction))
+        
+
+    def animate_dots_to_groups(self):
+        x = np.linspace(-3.5, -0.5, 10)
+        y = np.linspace(1.3, 1.1, 5)
+
+        x, y = np.meshgrid(x, y)
+        neg_coords = np.stack((x.flatten(), y.flatten()), axis=1)[:42]  # 42 neg points
+
+        x = np.linspace(0.5, 3.5, 10)
+        y = np.linspace(1.3, 1.1, 5)
+
+        x, y = np.meshgrid(x, y)
+        pos_coords = np.stack((x.flatten(), y.flatten()), axis=1)[:34]  # 34 pos points
+
+        sorted_coords = np.append(neg_coords, pos_coords, axis=0)
+
+
+        # Left Label
+        self.negative_label_group = VGroup()
+        left_arrow_start = self.graph.get_bottom()
+        left_arrow_start[0] = self.graph.coords_to_point(0.2, 0)[0]
+        left_arrow_end = np.array(
+            [self.graph.get_left()[0], self.graph.get_bottom()[1]]
+        )
+
+        self.negative_arrow = Arrow(left_arrow_start, left_arrow_end, color=RED)
+        self.negative_arrow.shift(DOWN * 0.3)
+
+        self.negative_text = Text("Negative Labels", font_size=28)
+        self.negative_text.move_to(self.negative_arrow.get_center()).shift(DOWN * 0.5)
+
+        self.negative_eq = Tex("\hat{y} < 0.5", isolate=["\hat{y}"]).scale(0.75)
+        self.negative_eq.set_color_by_tex_to_color_map({"\hat{y}": BLUE})
+        self.negative_eq.move_to(self.negative_text.get_center()).shift(DOWN * 0.5)
+
+        self.negative_label_group.add(self.negative_arrow, self.negative_text, self.negative_eq)
+        self.play(Write(self.negative_label_group))
+        
+        self.play(
+            LaggedStart(
+                *[
+                    dot.animate.move_to(self.graph.coords_to_point(*sorted_coords[i])).set_color(RED)
+                    for i, dot in enumerate(self.dots[:42])
+                ]
+            )
+        )
+        
+
+        # Right Label
+        self.positive_label_group = VGroup()
+
+        right_arrow_start = self.graph.get_bottom()
+        right_arrow_start[0] = self.graph.coords_to_point(-0.3, 0)[0]
+        right_arrow_end = np.array(
+            [self.graph.get_right()[0], self.graph.get_bottom()[1]]
+        )
+        self.positive_arrow = Arrow(right_arrow_start, right_arrow_end, color=GREEN)
+        self.positive_arrow.shift(DOWN * 0.3)
+
+        self.positive_text = Text("Positive Labels", font_size=28)
+        self.positive_text.move_to(self.positive_arrow.get_center()).shift(DOWN * 0.5)
+
+        self.positive_eq = Tex("\hat{y} \geq 0.5", isolate=["\hat{y}"]).scale(0.75)
+        self.positive_eq.set_color_by_tex_to_color_map({"\hat{y}": BLUE})
+        self.positive_eq.move_to(self.positive_text.get_center()).shift(DOWN * 0.5)
+
+        self.positive_label_group.add(self.positive_arrow, self.positive_text, self.positive_eq)
+
+        self.play(Write(self.positive_label_group))        
+        self.play(
+            LaggedStart(
+                *[
+                    dot.animate.move_to(self.graph.coords_to_point(*sorted_coords[42+i])).set_color(GREEN)
+                    for i, dot in enumerate(self.dots[42:])
+                ]
+            )
+        )
+
+    # def animate_label_indicators(self):
+
+
+
+    def animate_dots_to_sigmoid(self):
+        sigmoid_values = 1 / (1 + np.exp(-sorted_points))
+
+        self.play(
+            LaggedStart(
+                *[
+                    dot.animate.move_to(
+                        self.graph.coords_to_point(sorted_points[i], sigmoid_values[i])
+                    ).set_color(BLUE)
+                    for i, dot in enumerate(self.dots)
+                ]
+            )
+        )
+
+    def animate_dots_on_line(self):
+        self.dots = [
+            Dot(
+                self.number_line.number_to_point(sorted_points[i]),
+                radius=0.05,
+                color=ORANGE,
+            )
+            for i in range(sorted_points.shape[0])
+        ]
+        self.play(LaggedStart(*[FadeIn(dot) for dot in self.dots]), run_time=1.9)
+
+    def animate_sigmoid_function(self):
+        text = Text("Sigmoid Function", font_size=42)
+        text.move_to(self.graph.get_top()).shift(UP*0.3)
+        self.sigmoid_graph = self.graph.get_graph(
+            lambda x: (1 / (1 + np.exp(-x))), color=PURPLE
+        )
+        self.play(Write(text))
+        self.play(ShowCreation(self.sigmoid_graph))
+        self.wait(0.5)
+        self.play(FadeOut(text))
+        return
+
+    def create_right_column(self):
+        self.number_line_group = VGroup()
+        self.number_line = NumberLine(
+            color=WHITE, x_range=[-2, 4, 1], include_numbers=True, width=8
+        )
+        self.number_line.shift(DOWN)
+
+        self.number_line_label = Text(
+            "Output from Linear Transformations", font_size=24
+        )
+        self.number_line_label.move_to(self.number_line.get_center()).shift(DOWN * 0.6)
+
+        self.number_line_group.add(self.number_line, self.number_line_label)
+
+        self.graph = Axes(
+            (-4, 4, 1),
+            (0, 1, 0.25),
+            height=4,
+            width=6,
+            axis_config={"stroke_color": WHITE, "stroke_width": 2},
+        )
+        self.graph.add_coordinate_labels(font_size=16, num_decimal_places=2)
+
+        self.right_group = VGroup()
+        self.right_group.add(self.graph, self.number_line_group)
+        self.right_group.arrange(DOWN, buff=1)
+        return
+
+    def create_left_column(self):
+        self.top_text = Text("Logistic Function:\n" "Sigmoid Activation")
+
+        to_isolate = ["\sigma", "W", "x", "b", "z", "\hat{y}"]
+        self.equation = Tex(
+            "p(y|x) &= \sigma (W \cdot x + b) \\\\"
+            "z &= W \cdot x + b \\\\"
+            "\sigma ( z ) &= \hat{y} = {1 \over 1 + e^{-z}}",
+            isolate=[*to_isolate],
+        )
+
+        self.equation.set_color_by_tex_to_color_map({"\hat{y}": BLUE, "z": ORANGE, "\sigma": PURPLE})
+
+        to_isolate = ["\hat{y}", "z"]
+        self.definitions = Tex(
+            "\sigma",
+            "&\\text{: Sigmoid function}",
+            "\\\\",
+            "z",
+            "&\\text{: }\\parbox{3cm}{Output from linear transformation}",
+            "\\\\",
+            "\hat{y}",
+            "&\\text{: Probabilistic label}",
+        ).scale(0.9)
+        self.definitions.set_color_by_tex_to_color_map({"\hat{y}": BLUE, "z": ORANGE, "\sigma": PURPLE})
+
+        self.left_group = VGroup()
+        self.left_group.add(self.top_text, self.equation, self.definitions)
+        self.left_group.arrange(DOWN, buff=0.6)
+        self.left_group.to_edge(LEFT)
+        self.left_group.to_edge(UP)
+
+        line_top = self.left_group.get_top()
+        line_top[0] -= self.left_group.get_right()[0]
+        line_bottom = self.left_group.get_bottom()
+        line_bottom[0] -= self.left_group.get_right()[0]
+        self.line = Line(start=line_top, end=line_bottom)
+        self.line.shift(RIGHT)
+
+        return
+
+    def group_page(self):
+        self.page_group = VGroup()
+        self.page_group.add(self.left_group, self.line, self.right_group)
+        self.page_group.arrange()
+        self.page_group.to_edge(LEFT)
+        self.left_group.to_edge(UP)
+        return
+
 
 class Linear(Scene):
     def construct(self):
@@ -104,7 +376,7 @@ class Linear(Scene):
         self.play(TransformMatchingTex(self.linear.copy(), self.definitions))
         self.wait(1)
         self.play(Write(self.line))
-        
+
         # Right Column
         self.play(TransformMatchingTex(self.linear.copy(), self.expanded_equation))
 
@@ -117,10 +389,6 @@ class Linear(Scene):
 
     def animate_points(self):
         point_numbers = [0, 1, np.arange(2, points.shape[0] - 2).tolist(), -1]
-
-        beneath_point = (
-            Dot(self.expanded_equation.get_center()).shift(DOWN).get_center()
-        )
 
         for i in range(len(self.data_line)):
             target_position = self.number_line.number_to_point(points[point_numbers[i]])
@@ -150,7 +418,7 @@ class Linear(Scene):
                     self.expanded_equation[0].get_center(),
                     radius=0.05,
                     color=GREEN,
-                    opacity=0.75,
+                    fill_opactiy=0.75,
                 )
                 for _ in range(target_position.shape[0])
             ]
@@ -176,17 +444,12 @@ class Linear(Scene):
             )
 
     def write_numbers(self):
-        isolate = ["x"]
         self.data_line = Tex(
             "x_{\\text{age}} & = 59 & x_{\\text{max HR}} & = 161 & \dots\ &&  x_{\\text{cholesterol}} & = 234 \\\\",
             "x_{\\text{age}} & = 55 & x_{\\text{max HR}} & = 132 & \dots\ &&  x_{\\text{cholesterol}} & = 353 \\\\",
             """& \dots\ & \dots\ && \dots\ && \dots\ \\\\ """,
             "x_{\\text{age}} & = 42 & x_{\\text{max HR}} & = 125 & \dots\ &&  x_{\\text{cholesterol}} & = 315 \\\\",
         ).scale(0.5)
-
-        # 0.25
-        # 0.78
-        # 0.66
 
         self.right_group.add(self.data_line, self.expanded_equation, self.number_line)
         self.data_line.to_edge(UP)
