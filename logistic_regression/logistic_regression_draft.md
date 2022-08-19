@@ -192,7 +192,7 @@ https://gist.github.com/JacobBumgarner/b267213514e30c2a3e632a53fc3c5448
 
 
 ### 6. Notes and Resources
-Some questions I had when initially learning about gradient descent:
+Below are a few questions that I had when initially learning about logistic regression. Maybe they'll be interesting to you too!
 >**Q1:** Isn't a logistic regression model basically just a single unit of a neural network?<br><br>
 >**A1:** Effectively, yes. We can think of logistic regression models as single-layer, single-unit neural networks. [Sebastian Raschka][logit_network] provides some nice insight into why this is so. In fact, many neural networks use sigmoid activation functions to generate unit outputs, just as logistic regression does.
 

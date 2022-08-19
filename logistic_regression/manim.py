@@ -84,6 +84,430 @@ points = np.array(
 sorted_points = np.sort(points)
 
 
+class BackProp(Scene):
+    def construct(self):
+        self.construct_first_scene()
+        self.construct_second_scene()
+        self.construct_dW_scene()
+        self.construct_simplification_scene()
+        self.construct_dB_scene()
+        self.animate()
+
+    def animate(self):
+        # First scene
+        self.play(Write(self.title))
+        self.play(Write(self.intro1, run_time=4))
+        self.play(Write(self.intro2))
+        self.wait(0.75)
+        self.play(FadeOut(self.intro_group))
+
+        # Second scene
+        self.play(Write(self.chain_rule_text_W))
+        self.wait(0.5)
+        self.play(
+            TransformMatchingTex(
+                self.chain_rule_text_W.copy(), self.chain_rule_equation_W
+            )
+        )
+        self.wait(0.75)
+
+        # Third Scene
+        self.play(
+            FadeOut(self.chain_rule_text_W),
+            # self.chain_rule_equation_W.animate.shift(UP*2),
+            self.chain_rule_equation_W.animate.center().to_edge(LEFT),
+        )
+        self.play(
+            self.chain_rule_equation_W.animate.set_color_by_tex_to_color_map(
+                {"{dC}": WHITE, "{dW}": WHITE}
+            )
+        )
+
+        # Third scene - dW
+        # self.play(Indicate(self.chain_rule_equation_W[:3]))
+        self.play(
+            TransformMatchingTex(self.chain_rule_equation_W.copy()[4:5], self.dCdA),
+            self.chain_rule_equation_W.animate.set_color_by_tex_to_color_map(
+                {
+                    "{{dC} \\over {dA}}": PURPLE,
+                }
+            ),
+        )
+        self.wait(0.5)
+
+        self.play(
+            TransformMatchingTex(
+                self.chain_rule_equation_W.copy()[5:6], self.dAdZ1[0:2]
+            ),
+            self.chain_rule_equation_W.animate.set_color_by_tex_to_color_map(
+                {
+                    "{{dA} \\over {dZ}}": PINK,
+                }
+            ),
+        )
+        self.play(FadeIn(self.dAdZ1[2:]))
+        self.play(TransformMatchingTex(self.dAdZ1, self.dAdZ2))
+        self.wait(0.5)
+
+        self.play(
+            TransformMatchingTex(self.chain_rule_equation_W.copy()[6:], self.dZdW),
+            self.chain_rule_equation_W.animate.set_color_by_tex_to_color_map(
+                {
+                    "{{dZ} \\over {dW}}": TEAL,
+                }
+            ),
+        )
+        self.wait(1.5)
+        
+        # move them to prep for the next scene
+        self.play(
+            TransformMatchingTex(
+                self.chain_rule_equation_W, self.chain_rule_equation_W_simplification
+            ),
+            self.dCdA.animate.center().to_edge(DL).shift(UP),
+            self.dAdZ2.animate.center().to_edge(DOWN).shift(UP),
+            self.dZdW.animate.center().to_edge(DR).shift(UP).shift(LEFT),
+        )
+        self.wait(0.5)
+
+        # Fourth scene - simplification
+        self.play(FadeIn(self.expanded_dCdW[0:3]))
+
+        self.play(
+            Indicate(self.chain_rule_equation_W_simplification[3:5]),
+            TransformMatchingTex(self.dCdA, self.expanded_dCdW[3:8]),
+        )
+        self.wait(0.5)
+        self.play(
+            Indicate(self.chain_rule_equation_W_simplification[5:6]),
+            TransformMatchingTex(self.dAdZ2, self.expanded_dCdW[8:9]),
+        )
+        self.wait(0.5)
+        self.play(
+            Indicate(self.chain_rule_equation_W_simplification[6:]),
+            TransformMatchingTex(self.dZdW, self.expanded_dCdW[9:]),
+        )
+        self.wait(1)
+        
+        self.play(
+            TransformMatchingTex(self.expanded_dCdW.copy(), self.simplified_dCdW1)
+        )  # could make this prettier with a loop but whatever, just crunching
+        self.wait(0.5)
+        self.play(
+            TransformMatchingTex(self.simplified_dCdW1.copy(), self.simplified_dCdW2)
+        )
+        self.wait(0.5)
+        self.play(
+            TransformMatchingTex(self.simplified_dCdW2.copy(), self.simplified_dCdW3)
+        )
+        self.wait(0.5)
+        self.play(
+            TransformMatchingTex(
+                self.simplified_dCdW3.copy(), self.final_simplified_dCdW
+            )
+        )
+        self.wait(1)
+
+        # clear all, move to center
+        self.play(
+            FadeOut(self.simplification_group[1:-1]),
+            self.final_simplified_dCdW.animate.center().scale(1.25),  # scale back to 1
+        )
+        self.wait(1)
+
+        # Fifth scene, brief dB
+        self.play(FadeOut(self.final_simplified_dCdW))
+        self.play(Write(self.chain_rule_text_B))
+        self.wait(0.5)
+        self.play(
+            TransformMatchingTex(
+                self.chain_rule_text_B.copy(), self.chain_rule_equation_B
+            )
+        )
+        self.play(FadeIn(self.dZdB))
+        self.play(Write(self.tf))
+        self.play(FadeIn(self.simplified_dCdB))
+        self.wait(1)
+
+        self.play(
+            FadeOut(self.dB_group[1:-1]),
+            self.simplified_dCdB.animate.center(),
+        )
+        self.wait(1)
+
+        # Final
+        self.play(
+            FadeIn(self.final_simplified_dCdW.center().shift(UP)),
+            self.simplified_dCdB.animate.center().shift(DOWN),
+        )
+
+    def construct_dB_scene(self):
+        self.dB_group = VGroup()
+        to_isolate = ["{dC}", "{dB}"]
+        self.chain_rule_text_B = Tex(
+            "\\text{The deriative of C } ( {dC} ) \\text{ w.r.t the bias } ( {dB} )",
+            isolate=[*to_isolate],
+        )
+        self.chain_rule_text_B.set_color_by_tex_to_color_map({"dC": RED, "dB": ORANGE})
+
+        to_isolate = [
+            "{dC}",
+            "{dB}",
+            "{dA}",
+            "{dZ}",
+            "{{dC} \\over {dA}}",
+            "{{dA} \\over {dZ}}",
+            "{{dZ} \\over {dB}}",
+        ]
+        self.chain_rule_equation_B = Tex(
+            "{{dC} \\over {dB}}",
+            "= {{dC} \\over {dA}}",
+            "{{dA} \\over {dZ}}",
+            "{{dZ} \\over {dB}}",
+            isolate=[*to_isolate],
+        )
+        self.chain_rule_equation_B.set_color_by_tex_to_color_map(
+            {
+                "{dC}": RED,
+                "{dB}": ORANGE,
+                "{{dC} \\over {dA}}": WHITE,
+                "{{dA} \\over {dZ}}": WHITE,
+                "{{dZ} \\over {dB}}": WHITE,
+            }
+        )
+
+        self.dZdB = Tex("{{dZ} \\over {dB}}", " = 1", isolate=["{{dZ} \\over {dB}}"])
+
+        self.tf = Tex("\\therefore")
+
+        self.simplified_dCdB = Tex(
+            "{{dC} \\over {dB}}", " = (A - Y)", isolate=["{dC}", "{dB}"]
+        )
+        self.simplified_dCdB.set_color_by_tex_to_color_map(
+            {
+                "{dC}": RED,
+                "{dB}": ORANGE,
+            }
+        )
+
+        self.dB_group.add(
+            self.title,
+            self.chain_rule_text_B,
+            self.chain_rule_equation_B,
+            self.dZdB,
+            self.tf,
+            self.simplified_dCdB,
+        )
+        self.dB_group.arrange(DOWN, buff=0.4)
+        self.dB_group.to_edge(UP)
+
+    def construct_simplification_scene(self):
+        scalar = 0.8
+        self.simplification_group = VGroup()
+
+        to_isolate = [
+            "{dC}",
+            "{dW}",
+            "{dA}",
+            "{dZ}",
+            "{{dC} \\over {dA}}",
+            "{{dA} \\over {dZ}}",
+            "{{dZ} \\over {dW}}",
+        ]
+        self.chain_rule_equation_W_simplification = Tex(
+            "{{dC} \\over {dW}}",
+            "= {{dC} \\over {dA}}",
+            "{{dA} \\over {dZ}}",
+            "{{dZ} \\over {dW}}",
+            isolate=[*to_isolate],
+        ).scale(scalar)
+        self.chain_rule_equation_W_simplification.set_color_by_tex_to_color_map(
+            {
+                "{dC}": RED,
+                "{dW}": BLUE,
+                "{{dC} \\over {dA}}": WHITE,
+                "{{dA} \\over {dZ}}": WHITE,
+                "{{dZ} \\over {dW}}": WHITE,
+            }
+        )
+
+        to_isolate = [
+            "{dC}",
+            "{dB}",
+            "A(1-A)",
+            "X",
+            " = ",
+            "{{Y} \\over {A}}",
+            "{{1 - Y} \\over {1 - A}}",
+        ]
+        self.expanded_dCdW = Tex(
+            "{{dC} \\over {dW}}",
+            " = ",
+            " \\left( - {{Y} \\over {A}} + {{1 - Y} \\over {1 - A}} \\right)",
+            "A(1-A)",
+            "X",
+            isolate=[*to_isolate],
+        ).scale(scalar)
+        self.expanded_dCdW.set_color_by_tex_to_color_map({"{dC}": RED, "{dW}": BLUE})
+
+        to_isolate = ["A(1-A)", "X", "{{Y} \\over {A}}", "{{1 - Y} \\over {1 - A}}"]
+        self.simplified_dCdW1 = Tex(
+            " = ",
+            " \\left( - A(1-A) {{Y} \\over {A}} +  A(1-A) {{1 - Y} \\over {1 - A}} \\right)",
+            "X",
+            isolate=[*to_isolate],
+        ).scale(scalar)
+
+        to_isolate = ["X", "Y", "A"]
+        self.simplified_dCdW2 = Tex(
+            " = ",
+            " ( - Y(1-A) +  A(1-Y) )",
+            "X",
+            isolate=[*to_isolate],
+        ).scale(scalar)
+
+        to_isolate = ["X", "Y", "A"]
+        self.simplified_dCdW3 = Tex(
+            " = ",
+            " ( - Y + AY + A - AY )",
+            "X",
+            isolate=[*to_isolate],
+        ).scale(scalar)
+
+        to_isolate = ["X", "Y", "A", "{dC}", "{dB}"]
+        self.final_simplified_dCdW = Tex(
+            "{{dC} \\over {dW}}",
+            " = ",
+            " ( A - Y )",
+            "X",
+            isolate=[*to_isolate],
+        ).scale(scalar)
+        self.final_simplified_dCdW.set_color_by_tex_to_color_map(
+            {"{dC}": RED, "{dW}": BLUE}
+        )
+
+        self.simplification_group.add(
+            self.title,
+            self.chain_rule_equation_W_simplification,
+            self.expanded_dCdW,
+            self.simplified_dCdW1,
+            self.simplified_dCdW2,
+            self.simplified_dCdW3,
+            self.final_simplified_dCdW,
+        )
+        self.simplification_group.arrange(DOWN, buff=0.4)
+        self.simplification_group.to_edge(UP)
+
+    def construct_dW_scene(self):
+        self.dW_group1 = VGroup()
+        self.dW_group2 = VGroup()
+
+        to_isolate = [
+            "{dC}",
+            "{dA}",
+            "{{dC} \\over {dA}}",
+            "{{Y} \\over {A}}",
+            "{{1 - Y} \\over {1 - A}}",
+        ]
+        self.dCdA = Tex(
+            "{{dC} \\over {dA}}",
+            " = -{{Y} \\over {A}} + {{1 - Y} \\over {1 - A}}",
+            isolate=[*to_isolate],
+        )
+        self.dCdA.set_color_by_tex_to_color_map({"{{dC} \\over {dA}}": PURPLE,})
+
+        to_isolate = ["{dA}", "{dZ}", "{{dA} \\over {dZ}}", "A(1-A)"]
+        self.dAdZ1 = Tex(
+            "{{dA} \\over {dZ}} &= \\sigma{(Z)}(1 - \\sigma{(Z)})\\\\",
+            " &= A(1-A)",
+            isolate=[*to_isolate],
+        )
+        self.dAdZ1.set_color_by_tex_to_color_map({ "{{dA} \\over {dZ}}": PINK,})
+                           
+                    
+
+        self.dAdZ2 = Tex(
+            "{{dA} \\over {dZ}} = A(1-A)",
+            isolate=[*to_isolate],
+        )
+        self.dAdZ2.set_color_by_tex_to_color_map({ "{{dA} \\over {dZ}}": PINK,})
+
+        to_isolate = ["{dZ}", "{dW}", "{{dZ} \\over {dW}}", "X"]
+        self.dZdW = Tex("{{dZ} \\over {dW}} = X", isolate=[*to_isolate])
+        self.dZdW.set_color_by_tex_to_color_map({"{{dZ} \\over {dW}}": TEAL,})
+
+        self.dW_group1.add(self.title, self.dCdA, self.dAdZ1)
+        self.dW_group1.arrange(DOWN, buff=1)
+        self.dW_group1.to_edge(UP)
+        self.dW_group2.add(self.title, self.dCdA, self.dAdZ2, self.dZdW)
+        self.dW_group2.arrange(DOWN, buff=1)
+        self.dW_group2.to_edge(UP)
+
+    def construct_second_scene(self):
+        self.backprop_group = VGroup()
+
+        to_isolate = ["{dC}", "{dW}"]
+        self.chain_rule_text_W = Tex(
+            "\\text{Derivative of C } ( {dC} ) \\text{ w.r.t Weights } ( {dW} )",
+            isolate=[*to_isolate],
+        )
+        self.chain_rule_text_W.set_color_by_tex_to_color_map(
+            {"{dC}": RED, "{dW}": BLUE}
+        )
+        to_isolate = [
+            "{dC}",
+            "{dW}",
+            "{dA}",
+            "{dZ}",
+            "{{dC} \\over {dA}}",
+            "{{dA} \\over {dZ}}",
+            "{{dZ} \\over {dW}}",
+        ]
+        self.chain_rule_equation_W = Tex(
+            "{{dC} \\over {dW}}",
+            "= {{dC} \\over {dA}}",
+            "{{dA} \\over {dZ}}",
+            "{{dZ} \\over {dW}}",
+            isolate=[*to_isolate],
+        )
+        self.chain_rule_equation_W.set_color_by_tex_to_color_map(
+            {
+                "{dC}": RED,
+                "{dW}": BLUE,
+                "{{dC} \\over {dA}}": WHITE,
+                "{{dA} \\over {dZ}}": WHITE,
+                "{{dZ} \\over {dW}}": WHITE,
+            }
+        )
+
+        self.backprop_group.add(
+            self.title,
+            self.chain_rule_text_W,
+            self.chain_rule_equation_W,
+        )
+        self.backprop_group.arrange(DOWN, buff=1)
+        self.backprop_group.to_edge(UP)
+
+    def construct_first_scene(self):
+        self.intro_group = VGroup()
+
+        self.title = Title("Logistic Regression Backpropagation", font_size=42)
+        self.title.to_edge(UP)
+
+        self.intro1 = MarkupText(
+            "The goal of backpropagation is to find the partial derivative of the Cost\n"
+            "function with respect to the model's Weights and bias parameters. ",
+            alignment="CENTER",
+            # isolate=["Weights", "bias"],
+            t2c={"Cost": RED, "Weights": BLUE, "bias": ORANGE},
+            justify=True,
+        ).scale(0.8)
+
+        self.intro2 = MarkupText("This can be achieved with the chain rule.").scale(0.8)
+        self.intro_group.add(self.intro1, self.intro2)
+        self.intro_group.arrange(DOWN, buff=0.4)
+
+
 class Sigmoid(Scene):
     def construct(self):
         # Construct the main scene components
@@ -131,35 +555,34 @@ class Sigmoid(Scene):
 
         self.animate_dots_to_groups()
         self.wait(0.5)
-        # Fade the graph, add the "Disease" 
+        # Fade the graph, add the "Disease"
         self.play(
             FadeOut(self.graph),
             FadeOut(self.sigmoid_graph),
-            *[dot.animate.shift(DOWN*3) for dot in self.dots],
-            self.positive_label_group.animate.shift(UP*1.5),
-            self.negative_label_group.animate.shift(UP*1.5)
+            *[dot.animate.shift(DOWN * 3) for dot in self.dots],
+            self.positive_label_group.animate.shift(UP * 1.5),
+            self.negative_label_group.animate.shift(UP * 1.5)
         )
-        
+
         self.animate_prediction_text()
-        
+
         self.wait(1)
         self.play(*[FadeOut(item) for item in self.mobjects])
         return
-    
+
     def animate_prediction_text(self):
         self.prediction_title = Text("Model Predictions:", font_size=42)
-        self.prediction_title.move_to(self.graph.get_center()).shift(UP*1.8)
-        
+        self.prediction_title.move_to(self.graph.get_center()).shift(UP * 1.8)
+
         self.positive_prediction = Text("Heart Disease", font_size=32)
-        self.positive_prediction.move_to(self.positive_arrow.get_center()).shift(UP*2)
-        
+        self.positive_prediction.move_to(self.positive_arrow.get_center()).shift(UP * 2)
+
         self.negative_prediction = Text("No Heart Disease", font_size=32)
-        self.negative_prediction.move_to(self.negative_arrow.get_center()).shift(UP*2)
+        self.negative_prediction.move_to(self.negative_arrow.get_center()).shift(UP * 2)
 
         self.play(Write(self.prediction_title))
         self.play(Write(self.negative_prediction))
         self.play(Write(self.positive_prediction))
-        
 
     def animate_dots_to_groups(self):
         x = np.linspace(-3.5, -0.5, 10)
@@ -175,7 +598,6 @@ class Sigmoid(Scene):
         pos_coords = np.stack((x.flatten(), y.flatten()), axis=1)[:34]  # 34 pos points
 
         sorted_coords = np.append(neg_coords, pos_coords, axis=0)
-
 
         # Left Label
         self.negative_label_group = VGroup()
@@ -195,18 +617,21 @@ class Sigmoid(Scene):
         self.negative_eq.set_color_by_tex_to_color_map({"\hat{y}": BLUE})
         self.negative_eq.move_to(self.negative_text.get_center()).shift(DOWN * 0.5)
 
-        self.negative_label_group.add(self.negative_arrow, self.negative_text, self.negative_eq)
+        self.negative_label_group.add(
+            self.negative_arrow, self.negative_text, self.negative_eq
+        )
         self.play(Write(self.negative_label_group))
-        
+
         self.play(
             LaggedStart(
                 *[
-                    dot.animate.move_to(self.graph.coords_to_point(*sorted_coords[i])).set_color(RED)
+                    dot.animate.move_to(
+                        self.graph.coords_to_point(*sorted_coords[i])
+                    ).set_color(RED)
                     for i, dot in enumerate(self.dots[:42])
                 ]
             )
         )
-        
 
         # Right Label
         self.positive_label_group = VGroup()
@@ -226,21 +651,23 @@ class Sigmoid(Scene):
         self.positive_eq.set_color_by_tex_to_color_map({"\hat{y}": BLUE})
         self.positive_eq.move_to(self.positive_text.get_center()).shift(DOWN * 0.5)
 
-        self.positive_label_group.add(self.positive_arrow, self.positive_text, self.positive_eq)
+        self.positive_label_group.add(
+            self.positive_arrow, self.positive_text, self.positive_eq
+        )
 
-        self.play(Write(self.positive_label_group))        
+        self.play(Write(self.positive_label_group))
         self.play(
             LaggedStart(
                 *[
-                    dot.animate.move_to(self.graph.coords_to_point(*sorted_coords[42+i])).set_color(GREEN)
+                    dot.animate.move_to(
+                        self.graph.coords_to_point(*sorted_coords[42 + i])
+                    ).set_color(GREEN)
                     for i, dot in enumerate(self.dots[42:])
                 ]
             )
         )
 
     # def animate_label_indicators(self):
-
-
 
     def animate_dots_to_sigmoid(self):
         sigmoid_values = 1 / (1 + np.exp(-sorted_points))
@@ -269,7 +696,7 @@ class Sigmoid(Scene):
 
     def animate_sigmoid_function(self):
         text = Text("Sigmoid Function", font_size=42)
-        text.move_to(self.graph.get_top()).shift(UP*0.3)
+        text.move_to(self.graph.get_top()).shift(UP * 0.3)
         self.sigmoid_graph = self.graph.get_graph(
             lambda x: (1 / (1 + np.exp(-x))), color=PURPLE
         )
@@ -318,7 +745,9 @@ class Sigmoid(Scene):
             isolate=[*to_isolate],
         )
 
-        self.equation.set_color_by_tex_to_color_map({"\hat{y}": BLUE, "z": ORANGE, "\sigma": PURPLE})
+        self.equation.set_color_by_tex_to_color_map(
+            {"\hat{y}": BLUE, "z": ORANGE, "\sigma": PURPLE}
+        )
 
         to_isolate = ["\hat{y}", "z"]
         self.definitions = Tex(
@@ -331,7 +760,9 @@ class Sigmoid(Scene):
             "\hat{y}",
             "&\\text{: Probabilistic label}",
         ).scale(0.9)
-        self.definitions.set_color_by_tex_to_color_map({"\hat{y}": BLUE, "z": ORANGE, "\sigma": PURPLE})
+        self.definitions.set_color_by_tex_to_color_map(
+            {"\hat{y}": BLUE, "z": ORANGE, "\sigma": PURPLE}
+        )
 
         self.left_group = VGroup()
         self.left_group.add(self.top_text, self.equation, self.definitions)
