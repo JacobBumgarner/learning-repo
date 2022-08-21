@@ -7,9 +7,10 @@ The easiest way that for me to learn or improve my understanding of topics is by
 
 | Field | Method | Date |
 | ----- | ------ | ---- | 
-| Statistics | [Principal Component Analysis](pca/pca.ipynb) | 06/18/2022 |
-| ML/DL | [Softmax](softmax/softmax.ipynb) | 06/23/2022 |
+| ML | [Logistic Regression](https://medium.com/@jacobbumgarner/breaking-it-down-logistic-regression-e5c3f1450bd) | 08/21/2022 |
 | ML/DL | [Gradient Descent](https://medium.com/@jacobbumgarner/breaking-it-down-gradient-descent-b94c124f1dfd) | 07/25/2022 |
+| ML/DL | [Softmax](softmax/softmax.ipynb) | 06/23/2022 |
+| Statistics | [Principal Component Analysis](pca/pca.ipynb) | 06/18/2022 |
 
 ## Post Guidelines
 The goal for these articles that I create is to convert them into Medium posts. The [Post Guidelines](POST_GUIDELINES.md) describe my approach to this process.
