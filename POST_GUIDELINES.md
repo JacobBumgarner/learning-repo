@@ -5,7 +5,7 @@ As of July 2022, the ultimate goal for each of these topics is to create Medium 
 
 ### TOC
 1. [Writing Process](#1writing-process)
-    1.1 [Article Structure]()
+    1. [Article Structure](#11-article-structure)
 2. [Formatting Guidelines](#2formatting-guidelines)
     1. [Latex - Inline](#21-latex---inline)
     2. [Latex - Display](#22-latex---display)
@@ -16,7 +16,7 @@ As of July 2022, the ultimate goal for each of these topics is to create Medium 
     1. [Outline and Resource Medium Formatting](#31-outline-and-resources-medium-formatting)
 
 ## 1. Writing Process
-Each of the topics is initially written in a Jupyter notebook (`.ipynb`). The cell-oriented style off the notebooks is useful for me as I explore and learn about the topics and as I being to implement what I've learned with code. The topic will remain in the `.ipynb` format until the post is judged to be complete.
+Each of the topics is initially drafted as a Jupyter notebook. This draft will primarily contain code, but it can also contain key thoughts & outlines. After the skeleton of the code is completed, I start writing and editing the article on Medium.
 
 ### 1.1 Article Structure
 The structure of the article should be as follows:
@@ -73,13 +73,7 @@ Any generated post videos should be uploaded to [https://gfycat.com](https://gfy
 Tables should be converted to csv files and then converted into gists. The links should be inserted into the appropriate markdown location.
 
 ## 3 Publication Process
-At this stage, the topic exploration should be complete and ready to prepare for a publication.
-
-The first thing to do will be to create a `.md` file of the jupyter notebook via the following command. 
-
->`jupyter nbconvert filename.ipynb --to markdown`
-
-The notebook will be frozen as a draft, and the remainder of the editing will be done on this newly created markdown file. 
+At this stage, the topic exploration should be complete and ready to prepare for a publication. The writing and editing for the article should all take place on Medium.
 
 First, all of the codeblocks should be converted into gists and the gist links should be pasted plainly into the file (see above).
 
@@ -96,4 +90,4 @@ The resources should be hyperlinked.
 
 ---
 
-Last Update: 07/28/2022
+Last Update: 08/21/2022
