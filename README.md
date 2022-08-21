@@ -1,7 +1,7 @@
 # Learning Repo
 This is my public drafting space where I learn about or reinforce my understanding of various statistical methods, machine learning algorithms, deep learning models, or image processing techniques.
 
-The easiest way that for me to learn or improve my understanding of topics is by breaking them down to the basics and then teaching the concepts to others, à la [Richard Feynman](https://www.colorado.edu/artssciences-advising/resource-library/life-skills/the-feynman-technique-in-academic-coaching). After breaking down these topics and writing articles from the information that I've learned, I work to publish the results.
+The easiest way that for me to learn or improve my understanding of topics is by breaking them down to the basics and then teaching the concepts to others, à la [Richard Feynman](https://www.colorado.edu/artssciences-advising/resource-library/life-skills/the-feynman-technique-in-academic-coaching). After breaking down these topics, I work to write and publish articles on the information that I've learnred.
 
 ## Learning History
 
