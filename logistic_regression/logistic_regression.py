@@ -187,7 +187,7 @@ class LogisticRegression:
         self.fit = True
         return np.array(costs), np.array(accuracies), np.array(weight_hist).T, np.array(bias_hist).T[0, 0]
 
-    def predict(self, X) -> np.ndarray:
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """Predict the labels for a set of input data.
 
         Args:
