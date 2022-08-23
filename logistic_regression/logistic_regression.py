@@ -22,7 +22,7 @@ class LogisticRegression:
 
     def __init__(self, n_input_features: int):
         """Initialize the model."""
-        self.weights = np.zeros((n_input_features, 1))  # column matches X rows
+        self.weights = np.random.randn((n_input_features, 1))*0.01  # column matches X rows
         self.bias = np.zeros((1,1))
 
         self.fit = False  # indicates the training state of the classifier
