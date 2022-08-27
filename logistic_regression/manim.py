@@ -158,7 +158,7 @@ class BackProp(Scene):
             ),
         )
         self.wait(1.5)
-        
+
         # move them to prep for the next scene
         self.play(
             TransformMatchingTex(
@@ -188,7 +188,7 @@ class BackProp(Scene):
             TransformMatchingTex(self.dZdW, self.expanded_dCdW[9:]),
         )
         self.wait(1)
-        
+
         self.play(
             TransformMatchingTex(self.expanded_dCdW.copy(), self.simplified_dCdW1)
         )  # could make this prettier with a loop but whatever, just crunching
@@ -414,7 +414,11 @@ class BackProp(Scene):
             " = -{{Y} \\over {A}} + {{1 - Y} \\over {1 - A}}",
             isolate=[*to_isolate],
         )
-        self.dCdA.set_color_by_tex_to_color_map({"{{dC} \\over {dA}}": PURPLE,})
+        self.dCdA.set_color_by_tex_to_color_map(
+            {
+                "{{dC} \\over {dA}}": PURPLE,
+            }
+        )
 
         to_isolate = ["{dA}", "{dZ}", "{{dA} \\over {dZ}}", "A(1-A)"]
         self.dAdZ1 = Tex(
@@ -422,19 +426,29 @@ class BackProp(Scene):
             " &= A(1-A)",
             isolate=[*to_isolate],
         )
-        self.dAdZ1.set_color_by_tex_to_color_map({ "{{dA} \\over {dZ}}": PINK,})
-                           
-                    
+        self.dAdZ1.set_color_by_tex_to_color_map(
+            {
+                "{{dA} \\over {dZ}}": PINK,
+            }
+        )
 
         self.dAdZ2 = Tex(
             "{{dA} \\over {dZ}} = A(1-A)",
             isolate=[*to_isolate],
         )
-        self.dAdZ2.set_color_by_tex_to_color_map({ "{{dA} \\over {dZ}}": PINK,})
+        self.dAdZ2.set_color_by_tex_to_color_map(
+            {
+                "{{dA} \\over {dZ}}": PINK,
+            }
+        )
 
         to_isolate = ["{dZ}", "{dW}", "{{dZ} \\over {dW}}", "X"]
         self.dZdW = Tex("{{dZ} \\over {dW}} = X", isolate=[*to_isolate])
-        self.dZdW.set_color_by_tex_to_color_map({"{{dZ} \\over {dW}}": TEAL,})
+        self.dZdW.set_color_by_tex_to_color_map(
+            {
+                "{{dZ} \\over {dW}}": TEAL,
+            }
+        )
 
         self.dW_group1.add(self.title, self.dCdA, self.dAdZ1)
         self.dW_group1.arrange(DOWN, buff=1)

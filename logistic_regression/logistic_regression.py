@@ -23,7 +23,7 @@ class LogisticRegression:
     def __init__(self, n_input_features: int):
         """Initialize the model."""
         self.weights = np.zeros((n_input_features, 1))  # column matches X rows
-        self.bias = np.zeros((1,1))
+        self.bias = np.zeros((1, 1))
 
         self.fit = False  # indicates the training state of the classifier
 
@@ -91,8 +91,8 @@ class LogisticRegression:
             float: The cost of the iteration.
         """
         # Compute simplified dZ from chain rule product of dA * dZ
-        dZ = (A - Y)
-        
+        dZ = A - Y
+
         # Then compute dW and dB and find the average loss, i.e., cost
         dW = np.mean(dZ * X, axis=0, keepdims=True).T
         dB = np.mean(dZ, axis=0, keepdims=True).T
@@ -153,7 +153,7 @@ class LogisticRegression:
         for i in range(epochs):
             weight_hist.append(self.weights[:, 0].copy())
             bias_hist.append(self.bias.copy())
-            
+
             # Isolate the minibatch
             if minibatch_size:
                 batch_indices = np.random.choice(
@@ -185,7 +185,12 @@ class LogisticRegression:
             print(f"Final model cost: {cost:0.2f}              ")
 
         self.fit = True
-        return np.array(costs), np.array(accuracies), np.array(weight_hist).T, np.array(bias_hist).T[0, 0]
+        return (
+            np.array(costs),
+            np.array(accuracies),
+            np.array(weight_hist).T,
+            np.array(bias_hist).T[0, 0],
+        )
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predict the labels for a set of input data.
