@@ -85,6 +85,22 @@ class Labeling(Scene):
         self.graph_group.add(self.graph, *self.dots)
 
 
+class FunctionDifferentiation(Scene):
+    def construct(self):
+        
+        return
+    
+    def animate(self):
+        
+        return
+    
+    def construct_card(self):
+        self.title = Title("K-Means Function Differentiation")
+        
+        
+        return
+
+
 class KMeansIntro(Scene):
     def construct(self):
         self.construct_card_one()  # K-means definition
