@@ -86,19 +86,471 @@ class Labeling(Scene):
 
 
 class FunctionDifferentiation(Scene):
+    eq_scale = 0.8
+
     def construct(self):
-        
+        self.construct_group_one()
+        self.construct_group_four()  # must happen early for location placement
+        self.construct_group_two()
+        self.construct_group_three()
+        self.construct_group_five()
+        self.construct_group_six()
+        self.construct_group_seven()
+        self.construct_final_text()
+
+        self.animate()
         return
-    
+
     def animate(self):
+        # Write card one
+        self.play(Write(self.title))
+        self.wait(0.1)
+        self.play(Write(self.derivative1[0:1]))
+        self.play(Write(self.derivative1[1:-1]))
+        self.play(FadeIn(self.intro_text_group))
+        self.wait(2)
+        self.play(FadeOut(self.intro_text_group))
+        self.wait(0.5)
+
+        # Write card two
+        self.play(ReplacementTransform(self.derivative1[2:-1], self.derivative2))
+        self.wait(0.5)
+
+        # Write card three
+        self.play(ReplacementTransform(self.derivative2, self.derivative3))
+        self.wait(0.5)
+
+        # Write card four
+        # Update with replacement card four
+        self.remove(self.derivative1, self.derivative2, self.derivative3)
+        self.add(self.derivative4[:12])
+
+        self.play(FadeIn(self.k_sum_group), self.derivative4[9].animate.set_color(RED))
+        self.wait(2.5)
+
+        self.play(
+            TransformMatchingTex(
+                self.derivative4[7:12].copy(), self.derivative4[12:16]
+            ),
+        )
+        self.wait(0.5)
+
+        self.play(FadeIn(self.chain_rule_group))
+        self.wait(1.5)
+
+        self.play(
+            TransformMatchingTex(
+                self.derivative4[12:15].copy(), self.derivative4[16:19]
+            )
+        )
+        self.wait(0.5)
+
+        self.play(
+            TransformMatchingTex(
+                self.derivative4[15:16].copy(), self.derivative4[19:23]
+            )
+        )
+        self.wait(0.5)
+
+        self.play(
+            TransformMatchingTex(self.derivative4[15:16].copy(), self.derivative4[23:])
+        )
+        self.wait(1)
+
+        # Card five
+        self.play(TransformMatchingTex(self.derivative4[17:], self.derivative5))
+        self.wait(0.5)
+
+        # Card six
+        self.remove(self.derivative4[16:], self.derivative5)
+        self.add(self.derivative6[:1])
+        self.play(TransformMatchingTex(self.derivative5, self.derivative6[1:]))
+        self.wait(0.5)
+
+        self.play(
+            FadeOut(self.derivative4[:17]),
+            FadeOut(self.k_sum_group),
+            FadeOut(self.chain_rule_group),
+        )
+        self.remove(self.derivative4)
+        self.wait(0.5)
+
+        # Group 7
+        # line 1
+        dv6_reposition = self.minimization[0:10].get_left()
+        dv6_reposition[0] += self.derivative6.get_width() / 2
+        self.play(self.derivative6.animate.move_to(dv6_reposition))
+        self.add(self.minimization[0:10])
+        self.remove(self.derivative6)
+        self.wait(0.5)
+
+        self.play(FadeIn(self.minimization_text))
+        self.wait(2)
+
+        # line2
+        self.play(
+            FadeIn(self.minimization[10]),
+            TransformMatchingTex(
+                self.minimization[1:10].copy(), self.minimization[11:20]
+            ),
+        )
+        self.wait(0.5)
+        self.play(FadeOut(self.minimization_text))
+        self.wait(0.5)
+
+        # line 2.2
+        self.play(
+            TransformMatchingTex(self.minimization[10:20], self.minimization[20:29])
+        )
+        self.wait(0.5)
+
+        # line 3
+        # animate distribution of A_nk
+        self.play(
+            TransformMatchingTex(
+                self.minimization[20:23].copy(), self.minimization[29:32]
+            )
+        )
+        self.play(
+            TransformMatchingTex(
+                self.minimization[23:24].copy(), self.minimization[32:33]
+            ),
+            TransformMatchingTex(
+                self.minimization[25:26].copy(), self.minimization[33:34]
+            ),
+        )
+        self.play(
+            FadeIn(self.minimization[34]),
+            TransformMatchingTex(
+                self.minimization[23:24].copy(), self.minimization[35:36]
+            ),
+            TransformMatchingTex(
+                self.minimization[27:28].copy(), self.minimization[36:37]
+            ),
+        )
+        self.wait(0.5)
+
+        # line 3.2
+        self.play(
+            TransformMatchingTex(self.minimization[29:37], self.minimization[37:46])
+        )
+        self.wait(0.5)
+
+        # line 4
+        self.play(
+            TransformMatchingTex(
+                self.minimization[38:42].copy(), self.minimization[49:53]
+            )
+        )
+        self.play(
+            TransformMatchingTex(
+                self.minimization[42:46].copy(), self.minimization[46:49]
+            )
+        )
+        self.wait(0.5)
+
+        # line 4.2
+        self.play(
+            TransformMatchingTex(self.minimization[46:53], self.minimization[53:60])
+        )
+        self.wait(0.5)
+
+        # line 5
+        self.play(
+            TransformMatchingTex(
+                self.minimization[53:54].copy(), self.minimization[60:62]
+            )
+        )
+        self.play(
+            TransformMatchingTex(
+                self.minimization[57:60].copy(), self.minimization[62:65]
+            )
+        )
+        self.play(
+            TransformMatchingTex(
+                self.minimization[54:57].copy(), self.minimization[65:]
+            ),
+        )
+        self.wait(0.5)
+
+        # Final
+        self.play(
+            FadeOut(self.minimization[0:10]),
+            FadeOut(self.minimization[20:29]),
+            FadeOut(self.minimization[37:46]),
+            FadeOut(self.minimization[53:60]),
+        )
+        self.play(self.minimization[60:].animate.center().shift(UP).scale(1.23))
+        self.wait(0.5)
+        self.play(
+            FadeIn(self.summary_text1[:1]),
+            FadeIn(self.summary_text1[2:]),
+            FadeIn(self.summary_text2[:1]),
+            FadeIn(self.summary_text3[:1]),
+            FadeIn(self.summary_text3[2:3]),
+            FadeIn(self.summary_text4[:1]),
+            FadeIn(self.summary_text4[2:3]),
+            # line 1
+            TransformMatchingTex(
+                self.minimization[60:61].copy(), self.summary_text1[1:2]
+            ),
+            self.minimization[60].animate.set_color(RED),
+            # line 2
+            TransformMatchingTex(
+                self.minimization[64:65].copy(), self.summary_text2[1:2]
+            ),
+            # line 4
+            self.minimization[64].animate.set_color(BLUE),
+            TransformMatchingTex(
+                self.minimization[60:61].copy(), self.summary_text3[1:2]
+            ),
+            # line 4
+            TransformMatchingTex(
+                self.minimization[63:64].copy(), self.summary_text4[1:2]
+            ),
+            self.minimization[63].animate.set_color(PURPLE),
+            self.minimization[67].animate.set_color(PURPLE),
+        )
+        self.wait(5)
         
+        # Fade out
+        self.play(*[FadeOut(item) for item in self.mobjects])
+
         return
-    
-    def construct_card(self):
+
+    def construct_final_text(self):
+        to_isolate = ["\\mu_{k}"]
+        self.summary_text1 = Tex(
+            "\\text{To minimize the cost function } J \\text{, }",
+            "\\mu_{k}",
+            "\\text{ is updated}",
+            isolate=[*to_isolate],
+        )
+        self.summary_text1.set_color_by_tex_to_color_map({"\\mu_{k}": RED})
+
+        to_isolate = ["x_{n}"]
+        self.summary_text2 = Tex(
+            "\\text{to the average position of the labeled points }",
+            "x_{n}",
+            isolate=[*to_isolate],
+        )
+        self.summary_text2.set_color_by_tex_to_color_map({"x_{n}": BLUE})
+
+        to_isolate = ["\\mu_{k}"]
+        self.summary_text3 = Tex(
+            "\\text{that are members of cluster }",
+            "\\mu_{k}",
+            "\\text{.}",
+            isolate=[*to_isolate],
+        )
+        self.summary_text3.set_color_by_tex_to_color_map(
+            {"\\mu_{k}": RED}
+        )
+        to_isolate = ["A_{nk}"]
+        self.summary_text4 = Tex(
+            "\\text{This is regulated by }",
+            "A_{nk}",
+            "\\text{.}",
+            isolate=[*to_isolate],
+        )
+        self.summary_text4.set_color_by_tex_to_color_map(
+            {"A_{nk}": PURPLE}
+        )
+
+        self.summary_group = VGroup(
+            self.summary_text1, self.summary_text2, self.summary_text3, self.summary_text4
+        )
+        self.summary_group.arrange(DOWN, buff=0.1)
+        self.summary_group.shift(DOWN * 1.5)
+
+        return
+
+    def construct_group_seven(self):
+        to_isolate = [
+            "x_{n}",
+            "\\mu_{k}",
+            "\\sum_{n=1}^{N}",
+            "A_{nk}",
+            "\\frac{dJ}{d\\mu_{k}}",
+            "0",
+            "=",
+        ]
+        self.minimization = Tex(
+            "\\frac{dJ}{d\\mu_{k}} &= -2 \\sum_{n=1}^{N} A_{nk}(x_{n} - \\mu_{k})\\\\",
+            "0 &= -2 \\sum_{n=1}^{N} A_{nk}(x_{n} - \\mu_{k})\\\\",
+            "0 &= \\sum_{n=1}^{N} A_{nk}(x_{n} - \\mu_{k})\\\\",
+            "0 &= \\sum_{n=1}^{N} A_{nk}x_{n} - A_{nk}\\mu_{k}\\\\",
+            "0 &= \\sum_{n=1}^{N} A_{nk}x_{n} - \\sum_{n=1}^{N} A_{nk} \\mu_{k}\\\\",
+            "\\sum_{n=1}^{N} A_{nk} \\mu_{k} &= \\sum_{n=1}^{N} A_{nk}x_{n}\\\\",
+            "\\mu_{k} \\sum_{n=1}^{N} A_{nk} &= \\sum_{n=1}^{N} A_{nk}x_{n}\\\\",
+            "\\mu_{k} &= {\\sum_{n=1}^{N} A_{nk}x_{n} \\over \\sum_{n=1}^{N} A_{nk}}",
+            isolate=[*to_isolate],
+        ).scale(self.eq_scale)
+
+        self.minimization_group = self.group(self.title, self.minimization, buffer=0.2)
+
+        self.minimization_text = Tex(
+            "\\text{To minimize } J \\text{ w.r.t. } \\mu_{k} \\text{, set } \\frac{dJ}{d\\mu_{k}} = 0"
+        ).scale(0.8)
+        self.minimization_text.shift(DOWN * 0.5)
+
+        # arrange lines
+        eq2_center = self.minimization[10:20].get_center()
+        eq3_center = self.minimization[20:29].get_center()
+        eq4_center = self.minimization[29:37].get_center()
+        eq5_center = self.minimization[37:46].get_center()
+        eq6_center = self.minimization[46:53].get_center()
+        eq7_center = self.minimization[53:60].get_center()
+        eq8_center = self.minimization[60:].get_center()
+
+        # move appropriate lines
+        eq3_pos = eq2_center.copy()
+        eq3_pos[0] = eq3_center[0]
+        self.minimization[20:29].move_to(eq3_pos)
+
+        eq4_pos = eq3_center.copy()
+        eq4_pos[0] = eq4_center[0]
+        self.minimization[29:37].move_to(eq4_pos)
+
+        eq5_pos = eq4_pos.copy()
+        eq5_pos[0] = eq5_center[0]
+        self.minimization[37:46].move_to(eq5_pos)
+
+        eq6_pos = eq4_center.copy()
+        eq6_pos[0] = eq6_center[0]
+        self.minimization[46:53].move_to(eq6_pos)
+
+        eq7_pos = eq6_pos.copy()
+        eq7_pos[0] = eq7_center[0]
+        self.minimization[53:60].move_to(eq7_pos)
+
+        eq8_pos = eq5_center.copy()
+        eq8_pos[0] = eq8_center[0]
+        self.minimization[60:].move_to(eq8_pos)
+
+        return
+
+    def construct_group_six(self):
+        to_isolate = ["{x_{n} - \\mu_{k}}", "A_{nk}", "\\sum_{n=1}^{N}", "-2"]
+        self.derivative6 = Tex(
+            "\\frac{dJ}{d\\mu_{k}} = -2 \\sum_{n=1}^{N} A_{nk}({x_{n} - \\mu_{k}})",
+            isolate=[*to_isolate],
+        ).scale(self.eq_scale)
+
+        position = self.derivative4[16:].get_left()
+        position[0] += self.derivative6.get_width() / 2
+        self.derivative6.move_to(position)
+
+        return
+
+    def construct_group_five(self):
+        to_isolate = ["{x_{n} - \\mu_{k}}", "A_{nk}", "\\sum_{n=1}^{N}", "-2"]
+        self.derivative5 = Tex(
+            "\\sum_{n=1}^{N} A_{nk} -2({x_{n} - \\mu_{k}})", isolate=[*to_isolate]
+        ).scale(self.eq_scale)
+
+        position = self.derivative4[17:].get_left()
+        position[0] += self.derivative5.get_width() / 2
+        self.derivative5.move_to(position)
+
+        return
+
+    def construct_group_four(self):
+        to_isolate = [
+            "\\sum_{n=1}^{N}",
+            "\\sum_{k=1}^{K}",
+            "A_{nk}",
+            "({x_{n} - \\mu_{k}})^2",
+            "{x_{n} - \\mu_{k}}",
+        ]
+        self.derivative4 = Tex(
+            "J & = \\sum_{n=1}^{N} \\sum_{k=1}^{K} A_{nk} ||{x_{n} - \mu_{k}}||^2 \\\\",
+            "\\frac{dJ}{d\mu_{k}} &= \\sum_{n=1}^{N} \\sum_{k=1}^{K} A_{nk}",
+            "({x_{n} - \\mu_{k}})^2 \\\\",
+            "\\frac{dJ}{d\\mu_{k}} &= \\sum_{n=1}^{N} A_{nk}",
+            "({x_{n} - \\mu_{k}})^2\\\\",
+            "\\frac{dJ}{d\mu_{k}} &= ",
+            "\\sum_{n=1}^{N} A_{nk}",
+            "2",
+            "({x_{n} - \\mu_{k}})",
+            "\\cdot (0 - 1)",
+            isolate=[*to_isolate],
+        ).scale(self.eq_scale)
+
+        self.group_four = self.group(self.title, self.derivative4)
+
+        self.k_sum_group = VGroup()
+        self.k_sum_text = Tex("\\text{where } k \\neq \\text{cluster \\#:}").scale(0.65)
+        self.k_sum_eq = Tex("{dJ \\over d \\mu_{k}}(x_{n} - \\mu_{k}) = 0").scale(0.65)
+        self.k_sum_group.add(self.k_sum_text, self.k_sum_eq)
+        self.k_sum_group.arrange(DOWN, buff=0.1)
+        self.k_sum_group.move_to(self.derivative4[11].get_right())
+        self.k_sum_group.to_edge(RIGHT)
+
+        self.chain_rule_group = VGroup()
+        self.chain_rule_text = Tex("\\text{Apply chain rule to:}").scale(0.65)
+        self.chain_rule_eq = Tex("(x_{n}-\\mu{k})^2").scale(0.65)
+        self.chain_rule_group.add(self.chain_rule_text, self.chain_rule_eq)
+        self.chain_rule_group.arrange(DOWN, buff=0.1)
+        self.chain_rule_group.move_to(self.derivative4[12].get_right())
+        self.chain_rule_group.to_edge(RIGHT)
+
+        return
+
+    def construct_group_three(self):
+        to_isolate = ["{{x_{n} - \\mu_{k}}}"]
+        self.derivative3 = Tex("({{x_{n} - \mu_{k}}})^2", isolate=[*to_isolate]).scale(
+            self.eq_scale
+        )
+
+        position = self.derivative4[11].get_left()
+        position[0] += self.derivative3.get_width() / 2
+        self.derivative3.move_to(position)
+        return
+
+    def construct_group_two(self):
+        to_isolate = ["{{x_{n} - \mu_{k}}}"]
+        self.derivative2 = Tex(
+            "((({{x_{n} - \\mu_{k}}})^2)^{1/2})^2", isolate=[*to_isolate]
+        ).scale(self.eq_scale)
+
+        position = self.derivative4[11].get_left()
+        position[0] += self.derivative2.get_width() / 2
+        self.derivative2.move_to(position)
+        return
+
+    def construct_group_one(self):
+
         self.title = Title("K-Means Function Differentiation")
+
+        to_isolate = ["{{x_{n} - \mu_{k}}}"]
+        self.derivative1 = Tex(
+            "J & = \\sum_{n=1}^{N} \\sum_{k=1}^{K} A_{nk} ||{x_{n} - \mu_{k}}||^2 \\\\",
+            "\\frac{dJ}{d\\mu_{k}} &= \\sum_{n=1}^{N} \\sum_{k=1}^{K} A_{nk}",
+            "||{{x_{n} - \\mu_{k}}}||^2 \\\\",
+            # hidden line for alignment with later equation
+            "\\frac{dJ}{d\mu_{i}} &= \\sum_{n=1}^{N} A_{nk} 2 (x_{n} - \\mu_{k}) \\cdot (0 - 1)",
+            isolate=[*to_isolate],
+        ).scale(self.eq_scale)
+        self.group_one = self.group(self.title, self.derivative1)
         
-        
+        self.intro_text1 = Tex(
+            "\\text{To minimize } J \\text{ w.r.t. } \\mu_{k} \\text{,}"
+        ).scale(0.8)
+        self.intro_text2 = Tex(
+            "\\text{first differentiate } J \\text{ w.r.t } \\mu_{k}"
+        ).scale(0.8)
+        self.intro_text_group = VGroup(self.intro_text1, self.intro_text2)
+        self.intro_text_group.arrange(DOWN, buff=0.1)
+        self.intro_text_group.center().shift(DOWN*1.2)
         return
+
+    def group(self, *members, buffer=0.5):
+        group = VGroup()
+        group.add(*members)
+        group.arrange(DOWN, buff=buffer)
+        group.to_edge(UP)
+        return group
 
 
 class KMeansIntro(Scene):
