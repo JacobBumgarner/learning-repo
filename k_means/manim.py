@@ -85,6 +85,20 @@ class Labeling(Scene):
         self.graph_group.add(self.graph, *self.dots)
 
 
+class LabelUpdates(Scene):
+    def construct(self):
+        return
+
+    def animate(self):
+
+        return
+
+    def construct_left_panel(self):
+        self.title = 1
+
+        return
+
+
 class FunctionDifferentiation(Scene):
     eq_scale = 0.8
 
@@ -107,7 +121,7 @@ class FunctionDifferentiation(Scene):
         self.wait(0.1)
         self.play(Write(self.derivative1[0:1]))
         self.play(Write(self.derivative1[1:-1]))
-        self.play(FadeIn(self.intro_text_group))
+        self.play(Write(self.intro_text_group))
         self.wait(2)
         self.play(FadeOut(self.intro_text_group))
         self.wait(0.5)
@@ -125,7 +139,7 @@ class FunctionDifferentiation(Scene):
         self.remove(self.derivative1, self.derivative2, self.derivative3)
         self.add(self.derivative4[:12])
 
-        self.play(FadeIn(self.k_sum_group), self.derivative4[9].animate.set_color(RED))
+        self.play(Write(self.k_sum_group), self.derivative4[9].animate.set_color(RED))
         self.wait(2.5)
 
         self.play(
@@ -135,7 +149,7 @@ class FunctionDifferentiation(Scene):
         )
         self.wait(0.5)
 
-        self.play(FadeIn(self.chain_rule_group))
+        self.play(Write(self.chain_rule_group))
         self.wait(1.5)
 
         self.play(
@@ -184,7 +198,7 @@ class FunctionDifferentiation(Scene):
         self.remove(self.derivative6)
         self.wait(0.5)
 
-        self.play(FadeIn(self.minimization_text))
+        self.play(Write(self.minimization_text))
         self.wait(2)
 
         # line2
@@ -312,7 +326,7 @@ class FunctionDifferentiation(Scene):
             self.minimization[67].animate.set_color(PURPLE),
         )
         self.wait(5)
-        
+
         # Fade out
         self.play(*[FadeOut(item) for item in self.mobjects])
 
@@ -343,9 +357,7 @@ class FunctionDifferentiation(Scene):
             "\\text{.}",
             isolate=[*to_isolate],
         )
-        self.summary_text3.set_color_by_tex_to_color_map(
-            {"\\mu_{k}": RED}
-        )
+        self.summary_text3.set_color_by_tex_to_color_map({"\\mu_{k}": RED})
         to_isolate = ["A_{nk}"]
         self.summary_text4 = Tex(
             "\\text{This is regulated by }",
@@ -353,12 +365,13 @@ class FunctionDifferentiation(Scene):
             "\\text{.}",
             isolate=[*to_isolate],
         )
-        self.summary_text4.set_color_by_tex_to_color_map(
-            {"A_{nk}": PURPLE}
-        )
+        self.summary_text4.set_color_by_tex_to_color_map({"A_{nk}": PURPLE})
 
         self.summary_group = VGroup(
-            self.summary_text1, self.summary_text2, self.summary_text3, self.summary_text4
+            self.summary_text1,
+            self.summary_text2,
+            self.summary_text3,
+            self.summary_text4,
         )
         self.summary_group.arrange(DOWN, buff=0.1)
         self.summary_group.shift(DOWN * 1.5)
@@ -533,7 +546,7 @@ class FunctionDifferentiation(Scene):
             isolate=[*to_isolate],
         ).scale(self.eq_scale)
         self.group_one = self.group(self.title, self.derivative1)
-        
+
         self.intro_text1 = Tex(
             "\\text{To minimize } J \\text{ w.r.t. } \\mu_{k} \\text{,}"
         ).scale(0.8)
@@ -542,7 +555,7 @@ class FunctionDifferentiation(Scene):
         ).scale(0.8)
         self.intro_text_group = VGroup(self.intro_text1, self.intro_text2)
         self.intro_text_group.arrange(DOWN, buff=0.1)
-        self.intro_text_group.center().shift(DOWN*1.2)
+        self.intro_text_group.center().shift(DOWN * 1.2)
         return
 
     def group(self, *members, buffer=0.5):
@@ -567,9 +580,9 @@ class KMeansIntro(Scene):
         self.wait(0.25)
 
         # Card one: K-means definition
-        self.play(FadeIn(self.definition))
+        self.play(Write(self.definition[:]))
         self.wait(1.5)
-        self.play(FadeIn(self.k_definition))
+        self.play(Write(self.k_definition[:]))
         self.wait(2)
         self.play(
             TransformMatchingTex(self.k_definition[1:2].copy(), self.k_n_eq[0:1]),
@@ -580,11 +593,11 @@ class KMeansIntro(Scene):
         self.play(FadeOut(self.card_one_group))
 
         # Card two: K-means equation
-        self.play(FadeIn(self.k_eq_definition))
+        self.play(Write(self.k_eq_definition))
         self.wait(1)
-        self.play(FadeIn(self.k_means_eq))
+        self.play(Write(self.k_means_eq[:]))
         self.wait(1)
-        self.play(FadeIn(self.where))
+        self.play(Write(self.where))
         self.wait(1)
 
         self.play(
@@ -592,7 +605,7 @@ class KMeansIntro(Scene):
                 {"||x_{n} - \mu_{k}||^2": BLUE}
             ),
             TransformMatchingTex(self.k_means_eq[2:3].copy(), self.norm_eq),
-            FadeIn(self.norm_def),
+            Write(self.norm_def[:]),
         )
         self.wait(3)
 
@@ -611,11 +624,11 @@ class KMeansIntro(Scene):
         )
         self.wait(0.5)
         self.play(
-            FadeIn(self.kron_1),
+            Write(self.kron_1[:]),
         )
         self.wait(2)
         self.play(
-            FadeIn(self.kron_2),
+            Write(self.kron_2[:]),
         )
         self.wait(2)
 
@@ -624,7 +637,11 @@ class KMeansIntro(Scene):
                 {"{c}": TEAL, "{x}": ORANGE}
             ),
             TransformMatchingTex(self.kron_1[1:2].copy(), self.cn_def[0:1]),
-            FadeIn(self.cn_def[1]),
+        )
+        self.play(
+            Write(self.cn_def[1:2]),
+        )
+        self.play(
             TransformMatchingTex(self.kron_1[4:5].copy(), self.cn_def[2:]),
         )
         self.wait(3)
@@ -632,13 +649,13 @@ class KMeansIntro(Scene):
         self.play(FadeOut(self.card_two_group[1:]))
 
         # Card three: K-means algorithm
-        self.play(FadeIn(self.algorithm_definition))
+        self.play(Write(self.algorithm_definition[:]))
         self.wait(2)
-        self.play(FadeIn(self.label_group))
+        self.play(Write(self.label_group[:]))
         self.wait(1.5)
-        self.play(FadeIn(self.cluster_group))
+        self.play(Write(self.cluster_group[:]))
         self.wait(1.5)
-        self.play(FadeIn(self.final_update))
+        self.play(Write(self.final_update[:]))
         self.wait(2)
         self.play(Write(self.arc1))
         self.play(Write(self.arc2))
@@ -847,15 +864,7 @@ class KMeansIntro(Scene):
         self.definition.set_color_by_tex_to_color_map({"${k}$": BLUE})
 
         to_isolate = ["{k}", "{n}"]
-        # self.k_definition = Tex(
-        #     "\\text{The number of clusters (}",
-        #     "{k}",
-        #     "\\text{) is user-defined and must not }\\\\"
-        #     "\\text{exceed the number of input data points (}"
-        #     "{n}",
-        #     "\\text{).}",
-        #     isolate=[*to_isolate],
-        # )
+
         to_isolate = ["${k}$", "${n}$"]
         self.k_definition = TexText(
             "The number of clusters (",
