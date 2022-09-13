@@ -4,6 +4,7 @@ Author: Jacob R. Bumgarner
 Email: jacobbum21@gmail.com
 """
 import numpy as np
+from scipy.spatial.distance import cdist
 
 
 def update_centroid_locations(
@@ -82,13 +83,14 @@ def calculate_distances(input_data: np.ndarray, centroids: np.ndarray) -> np.nda
         ``(m, n)``, where ``m`` is the number of clusters, and ``n`` is the number of
         input data points.
     """
-    distances = np.zeros((centroids.shape[0], input_data.shape[0]))
-    for i in range(centroids.shape[0]):
-        distances[i] = np.linalg.norm(input_data - centroids[i], axis=-1)
+    # distances = np.zeros((centroids.shape[0], input_data.shape[0]))
+    # for i in range(centroids.shape[0]):
+    #     distances[i] = np.linalg.norm(input_data - centroids[i], axis=-1)
+    distances = cdist(input_data, centroids, "sqeuclidean")
     return distances
 
 
-def init_centroids(input_data: np.ndarray, n_centroids: int) -> np.ndarray:
+def init_centroids_random(input_data: np.ndarray, n_centroids: int) -> np.ndarray:
     """Initialize centroid points.
 
     Parameters
@@ -106,13 +108,57 @@ def init_centroids(input_data: np.ndarray, n_centroids: int) -> np.ndarray:
     """
     rows = np.random.choice(input_data.shape[0], n_centroids, replace=False)
     centroids = input_data[rows]
-
     return centroids
+
+
+def init_centroids_plusplus(input_data: np.ndarray, n_centroids: int) -> np.ndarray:
+    """Initialize centroid points using the kmeans++ algorithm.
+
+    Parameters
+    ----------
+    input_data : np.ndarray
+        The input data.
+    n_centroids : int
+        The number of centroid points to initialize from randomly selected points in
+        the input dataset.
+
+    Returns
+    -------
+    centroids : np.ndarray
+        The initialized centroids
+    """
+    centroids = []
+    centroid_rows = []
+    
+    # randomly select first centroid
+    centroid_rows.append(np.random.choice(input_data.shape[0]))
+    centroids.append(input_data[centroid_rows[0]])
+    
+    # Select other centroids
+    for i in range(1, n_centroids):
+        # compute squared l2 of input_data to all centroids
+        distances = cdist(input_data, np.asarray(centroids), 'sqeuclidean')
+        
+        # get min distance for the centroids
+        distances = distances.min(axis=1)
+
+        # create probability distribution
+        prob_distribution = distances / distances.sum()
+        while True:
+            # select a new centroid randomly based on the generated prob dist.
+            row = np.random.choice(input_data.shape[0], p=prob_distribution)
+            if row not in centroid_rows:  # don't reuse centroids
+                centroids.append(input_data[row])
+                centroid_rows.append(row)
+            break
+
+    return np.asarray(centroids)
 
 
 def k_means(
     input_data: np.ndarray,
     n_clusters: int = 3,
+    centroid_init: str = "kmeans++",
     max_iteration: int = 1000,
     verbose: bool = False,
 ) -> np.ndarray:
@@ -128,11 +174,14 @@ def k_means(
         the number of samples, and ``n`` is the dimensionality of the input dataset.
     n_clusters : int, optional
         The number of clusters to compute, defaults to 3.
+    centroid_init : str, optional
+        The method used to initialized the centroids. Must be either "kmeans++" or
+        "random". Default is "kmeans++".
     max_iterations : int, optional
         The maximum  number of iterations that the algorithm will run prior to ending
         the convergence, defaults to 1000.
     verbose : bool, optional
-        Whether to print the status of the algorithm, defaults to False.
+        Whether to print the status of the algorithm. Defalut is False.
 
     Returns
     -------
@@ -148,10 +197,10 @@ def k_means(
         raise TypeError("The input array should only have two dimensions.")
 
     # First initialize random location for the clusters
-    # centroids = np.random.uniform(
-    #     input_data.min(), input_data.max(), (n_clusters, input_data.shape[-1])
-    # )
-    centroids = init_centroids(input_data, n_clusters)
+    if centroid_init == "kmeans++":
+        centroids = init_centroids_plusplus(input_data, n_clusters)
+    else:
+        centroids = init_centroids_random(input_data, n_clusters)
 
     # Keep track of centroid history for visualization purposes
     centroid_history = [centroids.copy()]
