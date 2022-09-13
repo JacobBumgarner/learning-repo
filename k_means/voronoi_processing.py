@@ -7,9 +7,7 @@ from shapely.ops import clip_by_rect
 def interpolate_centroid_history(
     centroids_history: list,
     frames: int,
-    front_pad: bool = True,
-    front_pad_number: int = 4,
-    front_pad_frames: int = 10,
+    switch_buffer: int = 0,
 ):
     """Interpolate a centroid path at 30fps for a desired frame count."""
     frame_counts = np.linspace(0, frames, len(centroids_history), dtype=np.int_)
@@ -19,10 +17,16 @@ def interpolate_centroid_history(
 
     interpolated_history = []
     for i in range(len(centroids_history) - 1):
+        if switch_buffer:
+            interpolated_history.extend(
+                np.repeat([centroids_history[i]], switch_buffer, axis=0)
+            )
+
         interpolated_centroids = np.linspace(
             centroids_history[i], centroids_history[i + 1], frame_counts[i]
         )
         interpolated_history.extend(interpolated_centroids)
+
     interpolated_history = np.array(interpolated_history)
     return interpolated_history
 

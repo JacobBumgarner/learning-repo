@@ -88,6 +88,28 @@ def calculate_distances(input_data: np.ndarray, centroids: np.ndarray) -> np.nda
     return distances
 
 
+def init_centroids(input_data: np.ndarray, n_centroids: int) -> np.ndarray:
+    """Initialize centroid points.
+
+    Parameters
+    ----------
+    input_data : np.ndarray
+        The input data.
+    n_centroids : int
+        The number of centroid points to initialize from randomly selected points in
+        the input dataset.
+
+    Returns
+    -------
+    centroids : np.ndarray
+        The initialized centroids
+    """
+    rows = np.random.choice(input_data.shape[0], n_centroids, replace=False)
+    centroids = input_data[rows]
+
+    return centroids
+
+
 def k_means(
     input_data: np.ndarray,
     n_clusters: int = 3,
@@ -126,9 +148,10 @@ def k_means(
         raise TypeError("The input array should only have two dimensions.")
 
     # First initialize random location for the clusters
-    centroids = np.random.uniform(
-        input_data.min(), input_data.max(), (n_clusters, input_data.shape[-1])
-    )
+    # centroids = np.random.uniform(
+    #     input_data.min(), input_data.max(), (n_clusters, input_data.shape[-1])
+    # )
+    centroids = init_centroids(input_data, n_clusters)
 
     # Keep track of centroid history for visualization purposes
     centroid_history = [centroids.copy()]
@@ -142,6 +165,9 @@ def k_means(
         not np.all(np.isclose(centroids, old_centroids, atol=0.001))
         and iteration < max_iteration
     ):
+        if verbose:
+            print(f"Iteration: {iteration}")
+
         # Keep track of the old centroids
         old_centroids = centroids.copy()
 

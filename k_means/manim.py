@@ -64,7 +64,7 @@ class Labeling(Scene):
                     *polygon_points[j],
                     fill_color=color,
                     fill_opacity=0.5,
-                    stroke_width=2
+                    stroke_width=2,
                 )
                 polygons.append(p)
             self.add(*polygons)
@@ -87,16 +87,91 @@ class Labeling(Scene):
 
 class LabelUpdates(Scene):
     def construct(self):
+        self.construct_left_panel()
+
+        self.animate()
         return
 
     def animate(self):
+        self.play(Write(self.title))
+        self.play(Write(self.label_eq[:]))
+
+        self.play(
+            TransformMatchingTex(self.label_eq[:1].copy(), self.eq_breakdown[0:2]),
+            self.label_eq[0].animate.set_color(RED),
+        )
+        self.play(
+            TransformMatchingTex(self.label_eq[3:4].copy(), self.eq_breakdown[2:4]),
+            self.label_eq[4].animate.set_color(BLUE),
+        )
+        self.play(
+            TransformMatchingTex(self.label_eq[6:7].copy(), self.eq_breakdown[4:6]),
+            self.label_eq[6].animate.set_color(ORANGE),
+        )
+        self.play(
+            TransformMatchingTex(self.label_eq[2:3].copy(), self.eq_breakdown[6:8]),
+            self.label_eq[2].animate.set_color(PURPLE),
+        )
 
         return
 
     def construct_left_panel(self):
-        self.title = 1
+        self.title = Text("K-Means Clustering:\n" "Label Assignment")
+
+        to_isolate = ["{c}", "x", "\\mu", "\\text{argmin}"]
+        self.label_eq = Tex(
+            "{c}_{n} = \\text{argmin}_{k} \\vert\\vert x_{n} - \\mu_{k} \\vert\\vert^2",
+            isolate=[*to_isolate],
+        )
+
+        to_isolate = ["{c}", "x", "\\mu", "\\text{argmin}"]
+        self.eq_breakdown = Tex(
+            "{c}",
+            "&\\text{: }\\parbox{3.5cm}{\\raggedright Vector containing labels for input data}",
+            "\\\\",
+            "x",
+            "&\\text{: Input data}",
+            "\\\\",
+            "\\mu",
+            "&\\text{: Cluster centers}",
+            "\\\\",
+            "\\text{argmin}",
+            "&\\text{: }\\parbox{3.5cm}{\\raggedright Reports the index of the cloest cluster center}\\\\",
+            # isolate=[*to_isolate]
+        )
+        # self.eq_breakdown.set_color_by_tex_to_color_map(
+        #     {
+        #         "{c}": RED,
+        #         "x": BLUE,
+        #         "\\mu": ORANGE,
+        #         "\\text{argmin}": PURPLE
+        #     }
+        # )
+        self.eq_breakdown[0].set_color(RED)
+        self.eq_breakdown[2].set_color(BLUE)
+        self.eq_breakdown[4].set_color(ORANGE)
+        self.eq_breakdown[6].set_color(PURPLE)
+
+        self.left_group = self.group(
+            self.title, self.label_eq, self.eq_breakdown, buff=0.5, edge=UL
+        )
 
         return
+
+    def group(
+        self,
+        *objects,
+        arrangement=DOWN,
+        buff=0.5,
+        edge=None,
+    ):
+        group = VGroup(*objects)
+        group.arrange(arrangement, buff=buff)
+
+        if edge is not None:
+            group.to_edge(edge)
+
+        return group
 
 
 class FunctionDifferentiation(Scene):
