@@ -73,13 +73,12 @@ class KMeans:
             centroids = self._init_centroids_random(input_data, self.n_clusters)
 
         # Keep track of centroid history for visualization purposes
-        centroid_history = [centroids.copy()]
+        self.centroid_history = [centroids.copy()]
 
         # Now start the k_means algorithm.
         #   continue until the iterations are maxed or the centroids converge.
         iteration = 0
         old_centroids = centroids.copy() + 1
-        # while np.any(centroids != old_centroids) and iteration < max_iteration:
         while (
             not np.all(np.isclose(centroids, old_centroids, atol=0.001))
             and iteration < self.max_iterations
@@ -93,7 +92,7 @@ class KMeans:
             # Identify the labels for each point
             data_labels = self._compute_labels(input_data, centroids)
 
-            # Update the location of each centroid based on the current point labels
+            # Update each centroid position based on the current point labels
             centroids = self._update_centroid_locations(
                 centroids, input_data, data_labels
             )
@@ -101,7 +100,7 @@ class KMeans:
             # Update the iteration and old centroids
             iteration += 1
 
-            centroid_history.append(centroids.copy())
+            self.centroid_history.append(centroids.copy())
 
         return
 
@@ -115,8 +114,8 @@ class KMeans:
         input_data : np.ndarray
             The input data.
         n_centroids : int
-            The number of centroid points to initialize from randomly selected points in
-            the input dataset.
+            The number of centroid points to initialize from randomly
+            selected points in the input dataset.
 
         Returns
         -------
@@ -137,8 +136,8 @@ class KMeans:
         input_data : np.ndarray
             The input data.
         n_centroids : int
-            The number of centroid points to initialize from randomly selected points in
-            the input dataset.
+            The number of centroid points to initialize from randomly selected
+            points in the input dataset.
 
         Returns
         -------
@@ -160,9 +159,9 @@ class KMeans:
             # get min distance for the centroids
             distances = distances.min(axis=1)
 
-            # select a new centroid randomly based on the probability distribution
-            # previous centroids will have probabilities of 0 - highly unlikely to
-            # reselect them
+            # select a new centroid randomly based on the prob. distribution
+            # previous centroids will have probabilities of 0 - highly unlikely
+            # to get a reselection.
             prob_distribution = distances / distances.sum()
             centroid_index = np.random.choice(input_data.shape[0], p=prob_distribution)
 
@@ -195,7 +194,7 @@ class KMeans:
         labels = np.argmin(distances, axis=0)
         return labels
 
-    def calculate_distances(
+    def _calculate_distances(
         self, input_data: np.ndarray, centroids: np.ndarray
     ) -> np.ndarray:
         """Calculate the distance of each input point to each centroid.
@@ -209,10 +208,8 @@ class KMeans:
 
         Returns
         -------
-        distances : np.ndarray
-            The distances of each input data point to each centroid point. Has shape
-            ``(m, n)``, where ``m`` is the number of clusters, and ``n`` is the number of
-            input data points.
+        distances : np.ndarray with shape (m_samples, n_features).
+            The distances of each input data point to each centroid point.
         """
         distances = np.zeros((centroids.shape[0], input_data.shape[0]))
         for i in range(centroids.shape[0]):
@@ -223,7 +220,7 @@ class KMeans:
     def _update_centroid_locations(
         self, centroids: np.ndarray, input_data: np.ndarray, labels: np.ndarray
     ) -> np.ndarray:
-        """Update the location of each centroid to the center of mass of its labeled points.
+        """Update the location of each centroid to its center of mass.
 
         Parameters
         ----------
@@ -237,7 +234,7 @@ class KMeans:
         Returns
         -------
         centroids : np.ndarray
-            The updated centroids based on the center of mass of the current labeled points.
+            The updated centroids.
         """
         for i in range(
             centroids.shape[0]
