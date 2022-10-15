@@ -4,8 +4,8 @@ Author: Jacob R. Bumgarner
 Email: jacobbum21@gmail.com
 """
 import numpy as np
-from scipy.spatial.distance import cdist
 
+from scipy.spatial.distance import cdist
 
 class KMeans:
     def __init__(

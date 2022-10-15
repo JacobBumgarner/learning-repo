@@ -15,19 +15,306 @@ from scipy.spatial.distance import cdist
 
 
 class KMeansAlgo(Scene):
-    def construct_parameters(self):
-        
+    def initialize_parameters(self):
+        """Initialize the parameters for the animation."""
+        self.data = np.load("data/synth_data.npy")
+        self.data = np.pad(self.data, ((0, 0), (0, 1)))  # manim needs 3D coordinates
+        self.centroid_history = np.load("data/centroid_history2.npy")
+        self.centroid_history = np.pad(self.centroid_history, ((0, 0), (0, 0), (0, 1)))
+        self.centroids = []
+
+        self.DOT_COLOR = "#a7b8c7"
+        self.C1_COLOR = "#00b4eb"
+        self.C2_COLOR = "#74feba"
+        self.C3_COLOR = "#ffa256"
+        self.C4_COLOR = "#ff4d27"
+        self.C_COLORS = [self.C1_COLOR, self.C2_COLOR, self.C3_COLOR, self.C4_COLOR]
+        self.D1_COLOR = "#75cfeb"
+        self.D2_COLOR = "#bfffdf"
+        self.D3_COLOR = "#ffbe8a"
+        self.D4_COLOR = "#ff8266"
+        self.D_COLORS = [self.D1_COLOR, self.D2_COLOR, self.D3_COLOR, self.D4_COLOR]
         return
-    
+
+    def get_labels(self):
+        """Return an array with the centroid labels for each dot based on proximity."""
+        dot_positions = np.array([dot.get_center() for dot in self.dots])
+        centroid_positions = np.array([c.get_center() for c in self.centroids])
+
+        distances = cdist(dot_positions, centroid_positions)
+        labels = np.argmin(distances, axis=1)
+
+        return labels
+
     def construct(self):
-        
+        """Construct the scene."""
+        self.initialize_parameters()
+        self.construct_left_panel()
+        self.construct_dividing_line()
+        self.construct_right_panel()
+
+        self.group_page()
+
+        self.animate()
         return
-    
+
     def animate(self):
-        
+        """Animate the scene."""
+        # Write the title, line, and graph
+        self.play(Write(self.title_group))
+        self.play(Write(self.dividing_line), Write(self.graph))
+        self.play(LaggedStart(*[FadeIn(dot) for dot in self.dots]), run_time=2)
+
+        # Write step 1
+        self.play(Write(self.step1_text[:]))
+        self.construct_animate_centroid_init(0)
+
+        # Write step 2
+        self.play(Write(self.step2_text[:]))
+        self.play(Write(self.step2_equation[:]))
+        self.construct_animate_centroid_distance_lines()
+        self.animate_label_assignment()
+
+        # Write step 3
+        self.play(
+            Write(self.step3_text[:]),
+            self.step2_equation[4].animate.set_color("#02BDCF"),
+        )
+        self.play(Write(self.step3_equation[:]))
+
+        # Write step 4, iterate until convergence
+        self.play(Write(self.step4_text[:]))
+
+        # Fade all out
+
         return
     
-    
+    def animate_centroid_position_update(self):
+        """Animate the update to the centroid positions."""
+        
+        return
+
+    def animate_label_assignment(self):
+        """Animate the assignment of the labels to the dots."""
+
+        # Retrieve the labels again
+        labels = self.get_labels()
+
+        # Animate the color shift of all of the labels
+        dot_animations = []
+        for i, dot in enumerate(self.dots):
+            animation = dot.animate.set_color(self.D_COLORS[labels[i]])
+            dot_animations.append(animation)
+
+        # Then animate the projection of the final lines into each dot.
+        # The "end" of each line should be at the dots because of how they were created
+        line_animations = []
+        for line in self.final_lines:
+            animation = line.animate.put_start_and_end_on(
+                line.get_end(), line.get_end()
+            )
+            line_animations.append(animation)
+
+        # reanimate the centroids just to keep them on top
+        centroid_animations = []
+        for i, centroid in enumerate(self.centroids):
+            centroid_animations.append(centroid.animate.set_color(self.C_COLORS[i]))
+            
+        self.play(
+            LaggedStart(
+                AnimationGroup(*line_animations),
+                AnimationGroup(*dot_animations),
+                AnimationGroup(*centroid_animations),               
+            ),
+            run_time=2,
+        )
+
+        # Fade out the lines
+        self.play(*[FadeOut(line) for line in self.final_lines])
+
+        return
+
+    def construct_animate_centroid_distance_lines(self):
+        """Animate the line projections/retractions of the shortest lines to dots."""
+        # Get the labels for the dots
+        temp_lines = []
+        self.final_lines = []
+
+        labels = self.get_labels()
+
+        # Animate the construction of all of the lines
+        animations = []
+        for i, dot in enumerate(self.dots):
+            dot_animations = []
+            for j, centroid in enumerate(self.centroids):
+                line = Line(
+                    centroid.get_center(),
+                    dot.get_center(),
+                    stroke_width=1.5,
+                    color=self.C_COLORS[j],
+                )
+                dot_animations.append(Write(line))
+
+                if j != labels[i]:
+                    temp_lines.append(line)
+                else:
+                    self.final_lines.append(line)
+
+            animations.append(AnimationGroup(*dot_animations))
+            # animations.extend(dot_animations)
+
+        self.play(LaggedStart(*animations, lag_ratio=0.065))
+
+        # Animate the retration of the shortest lines
+        self.play(Indicate(self.step2_equation[2], scale_factor=2))
+        self.play(*[Uncreate(line) for line in temp_lines])
+        return
+
+    def construct_animate_centroid_init(self, step):
+        """Construct and animate the creation of the selected centroids."""
+        # Construct and then indicate all of the centroids for step 1
+        self.centroids = []
+        self.original_dots = []
+        for i in range(self.centroid_history.shape[1]):
+            # Construct the centroid
+            coords = self.graph.coords_to_point(*self.centroid_history[step, i])
+
+            centroid = Dot(coords, radius=0.1, color=self.C_COLORS[i])
+            self.centroids.append(centroid)
+
+            # Identify the first dot for the animation
+            original_dot_index = np.argwhere(
+                self.data[:, :2] == self.centroid_history[step, i, :2]
+            )[0, 0]
+            original_dot = self.dots[original_dot_index]
+            self.original_dots.append(original_dot)
+
+        animations = []
+        for centroid, dot in zip(self.centroids, self.original_dots):
+            animation = LaggedStart(
+                Indicate(dot, scale_factor=6, color=centroid.get_color()),
+                FadeIn(centroid),
+            )
+            animations.append(animation)
+
+        self.play(LaggedStart(*animations, lag_ratio=0.5))
+        return
+
+    def group_page(self):
+        """Group the main elements of the page together."""
+        self.page_group = VGroup(self.left_group, self.dividing_line, self.right_group)
+        self.page_group.arrange(RIGHT, buff=0.4)
+
+        self.page_group.to_edge(LEFT)
+
+        return
+
+    def construct_graph(self):
+        """Construct the graph and group the dots."""
+        self.graph = Axes([0, 5], [0, 5], width=7.14, height=4.64, tick_size=0.05)
+        self.graph.get_axes().set_stroke(width=3, color=WHITE)
+
+        # update position of dots
+        for i, dot in enumerate(self.dots):
+            dot.move_to(self.graph.coords_to_point(*self.data[i]))
+
+        # Create graph group
+        self.graph_group = VGroup()
+        self.graph_group.add(self.graph, *self.dots)
+
+        return
+
+    def construct_dots(self):
+        """Construct the dots."""
+        # Convert the input data to dots
+        # Keep the radius small
+        self.dots = [
+            Dot(radius=0.05, color=self.DOT_COLOR) for _ in range(self.data.shape[0])
+        ]
+        return
+
+    def construct_right_panel(self):
+        """Construct the right panel.
+
+        This function calls several separate functions for the graph creation.
+        """
+        self.construct_dots()
+        self.construct_graph()
+
+        self.right_group = VGroup(self.graph_group)
+        return
+
+    def construct_dividing_line(self):
+        """Construct the dividing line."""
+        self.dividing_line = Line(
+            self.left_group.get_top(), self.left_group.get_bottom()
+        )
+        return
+
+    def construct_left_panel(self):
+        """Construct the left panel.
+
+        This panel contains the scene title, the steps, and the equations.
+        """
+        # Title
+        self.title = Text("KMeans Algorithm")
+        self.title_ul = Underline(self.title)
+        self.title_group = VGroup(self.title, self.title_ul)
+
+        # Step 1
+        self.step1_text = TexText("1. Initialize centroid \\\\" "positions (${k = 4}$)")
+
+        # Step 2
+        to_isolate = ["${\\mu}$", "${X}$"]
+        self.step2_text = TexText(
+            "2. Assign labels (${\mu}$) \\\\",
+            "to all data (${X}$)",
+            isolate=[*to_isolate],
+        )
+        self.step2_text.set_color_by_tex_to_color_map(
+            {"${\\mu}$": "#DB238B", "${X}$": self.DOT_COLOR}
+        )
+
+        to_isolate = ["\\mu_{n}", "x_{n}", "c_{i}", "arg\\underset{i}{min}"]
+        self.step2_equation = Tex(
+            "\\mu_{n} = arg\\underset{i}{min}||x_{n} - c_{i}||", isolate=[*to_isolate]
+        ).scale(0.9)
+        self.step2_equation.set_color_by_tex_to_color_map(
+            {"\\mu_{n}": "#DB238B", "x_{n}": self.DOT_COLOR}
+        )
+        step2_group = VGroup(self.step2_text, self.step2_equation).arrange(DOWN)
+
+        # Step 3
+        to_isolate = ["${C}$", "${\\mu}$"]
+        self.step3_text = TexText(
+            "3. Update centroid\\\\", "positions (${C}$)", isolate=[*to_isolate]
+        )
+        self.step3_text.set_color_by_tex_to_color_map({"${C}$": "#02BDCF"})
+
+        to_isolate = ["c_{i}", "x_{n}"]
+        self.step3_equation = Tex(
+            "c_{i} = {\\sum_{n=1}^{N} x_{n} \\over \\sum_{n=1}^{N}A_{nk}}",
+            isolate=[*to_isolate],
+        )
+        self.step3_equation.set_color_by_tex_to_color_map(
+            {"c_{i}": "#02BDCF", "x_{n}": self.DOT_COLOR}
+        )
+        step3_group = VGroup(self.step3_text, self.step3_equation).arrange(DOWN)
+
+        # Step 4
+        self.step4_text = TexText("4. Repeat steps 2 \& 3\\\\", "until convergence")
+
+        # Group the panel
+        self.left_group = VGroup(
+            self.title_group,
+            self.step1_text,
+            step2_group,
+            step3_group,
+            self.step4_text,
+        ).scale(0.8)
+        self.left_group.arrange(DOWN, buff=0.375)
+
+        return
 
 
 class KMeansInit(Scene):
