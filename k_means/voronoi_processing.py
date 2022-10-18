@@ -47,8 +47,9 @@ def check_intersection(polygon: np.ndarray, bounding_box: np.ndarray):
     return True if intersection else False
 
 
-def generate_voronoi_coords(centroids: np.ndarray) -> np.ndarray:
-    """Populate a plane with extra points to help with voronoi."""
+def generate_boundary_points(centroids: np.ndarray) -> np.ndarray:
+    """Generate boundary points to ensure polygon completion from a voronoi algo."""
+    # Populate the plane with other points to avoid polygon construction issues.
     line1 = np.linspace((-1000, 1000), (1000, 1000), 20)
     line2 = np.linspace((1000, 1000), (1000, -1000), 20)
     line3 = np.linspace((1000, -1000), (-1000, -1000), 20)
@@ -56,7 +57,7 @@ def generate_voronoi_coords(centroids: np.ndarray) -> np.ndarray:
     line5 = np.linspace((-1000, 0), (0, 1000), 20)
     line6 = np.linspace((0, 1000), (1000, 0), 20)
     line7 = np.linspace((1000, 0), (0, -1000), 20)
-    line8 = np.linspace((0, -1000), (-1000, 0), 20)
+    line8 = np.linspace((0, -1000), (-1000, 0), 20)  # 160 pts is overkill but whatever
     lines = [line1, line2, line3, line4, line5, line6, line7, line8]
     coords = np.concatenate([centroids, *lines], axis=0)
     return coords
@@ -71,18 +72,16 @@ def generate_bounding_box(x_range: list, y_range: list) -> np.ndarray:
 def get_polygons(centroids: np.ndarray, x_range: list, y_range: list) -> list:
     """Return a list of the voronoi polygons associated with each centroid."""
     # Add some outlier boundary points to the plot in order to fill in the voronoi
-    coords = generate_voronoi_coords(centroids)
+    coords = generate_boundary_points(centroids)
 
-    # Create our bounding box array
+    # Create our bounding box array from the input x and y ranges.
     bounding_box = generate_bounding_box(x_range, y_range)
 
     # Create the voronoi diagram
     vor = Voronoi(coords)
 
-    # Polygons list
+    # Iterate through the region associated with each input point and create a polygon
     polygons = []
-
-    # Iterate through the region associated with each input point
     for r in range(coords.shape[0]):
         region = vor.regions[vor.point_region[r]]  # get the point region
 
@@ -92,8 +91,9 @@ def get_polygons(centroids: np.ndarray, x_range: list, y_range: list) -> list:
 
         polygon = np.array([vor.vertices[i] for i in region])
 
+        # If the polygon intersects with our bounding box, add it to the list
         if check_intersection(polygon, bounding_box):
-            polygon = clip_polygon(polygon, x_range, y_range)
+            polygon = clip_polygon(polygon, x_range, y_range)  # clip to the box
             polygons.append(polygon)
 
     return polygons
