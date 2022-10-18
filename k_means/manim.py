@@ -73,7 +73,11 @@ class KMeansAlgo(Scene):
         # Write step 2
         self.play(Write(self.step2_text[:]))
         self.play(Write(self.step2_equation[:]))
+        self.wait(0.5)
         self.construct_animate_centroid_distance_lines()
+        
+        self.play(Indicate(self.step2_text))
+        self.wait(0.5)
         self.animate_label_assignment()
 
         # Write step 3
@@ -82,79 +86,114 @@ class KMeansAlgo(Scene):
             self.step2_equation[6].animate.set_color("#02BDCF"),
         )
         self.play(Write(self.step3_equation[:]))
-        
+        self.wait(0.75)
+
         self.animate_centroid_position_update(1)
-        
 
         # Write step 4, iterate until convergence
         self.play(Write(self.step4_text[:]))
         for i in range(2, self.centroid_history.shape[0]):
             if i != 2:
                 self.play(Indicate(self.step4_text, scale_factor=1.25))
+            
             self.construct_animate_centroid_distance_lines(lag_ratio=0.025)
+            
+            self.play(Indicate(self.step2_text))
+            self.wait(0.5)
             self.animate_label_assignment()
+            
+            self.play(Indicate(self.step3_text, scale_factor=1.5))
+            self.wait(0.5)
             self.animate_centroid_position_update(i)
 
+
+        self.animate_graph_centering()
+
         # Fade all out
-        self.wait(1)
-        self.play(*[FadeOut(object) for object in self.mobjects])
+        # self.wait(1)
+        # self.play(*[FadeOut(object) for object in self.mobjects])
+        return
+    
+    def animate_graph_centering(self):
+        self.graph_group = VGroup(
+            self.graph,
+            *self.dots,
+            *self.centroids
+        )
+        
+        self.title_replacement = self.title_group.copy()
+        self.add(self.title_replacement)
+        
+        self.play(
+            self.graph_group.animate.scale(1.25).move_to(ORIGIN),
+            *[FadeOut(object) for object in self.left_group],
+            FadeOut(self.dividing_line)
+        )
         return
 
     def animate_centroid_position_update(self, step):
         """Animate the update to the centroid positions."""
-        # Animate text emphasis
-        if step > 1:
-            self.play(Indicate(self.step3_text, scale_factor=1.5))
-        
         new_positions = self.centroid_history[step]
         new_positions = [
             self.graph.coords_to_point(*position) for position in new_positions
         ]
-        
+
         # First create centroid persistant animations
         def create_persistent_animations():
             animations = []  # keeps centroids above lines
             for i, centroid in enumerate(self.centroids):
-                
+
                 color_animation = centroid.animate.set_color(self.C_COLORS[i])
                 animations.append(color_animation)
-            
-            return animations    
-        
+
+            return animations
+
         # Then animate lines from the dots to the new averaged position
         labels = self.get_labels()
         avg_lines = []
         for i, dot in enumerate(self.dots):
             label = labels[i]
-            line = Line(dot.get_center(), new_positions[label], color=self.D_COLORS[label], stroke_width=1.5)
-            
+            line = Line(
+                dot.get_center(),
+                new_positions[label],
+                color=self.D_COLORS[label],
+                stroke_width=1.5,
+            )
+
             avg_lines.append(line)
-            
-        self.play(AnimationGroup(*[Write(line) for line in avg_lines]), AnimationGroup(*create_persistent_animations()))  # play lines first
-        
+
+        self.play(
+            AnimationGroup(*[Write(line) for line in avg_lines]),
+            AnimationGroup(*create_persistent_animations()),
+        )  # play lines first
+        self.wait(0.3)
+
         # then move the centroids to the new position
         centroid_animations = []
         for i, centroid in enumerate(self.centroids):
             animation = centroid.animate.move_to(new_positions[i])
             centroid_animations.append(animation)
         self.play(*centroid_animations)
-        
+        self.wait(0.3)
+
         # Lastly, get rid of the lines, animate them all into the new centroid
         animations = []
         for line in avg_lines:
-            animation = line.animate.put_start_and_end_on(line.get_end(), line.get_end())
+            animation = line.animate.put_start_and_end_on(
+                line.get_end(), line.get_end()
+            )
             animations.append(animation)
-        
-        self.play(AnimationGroup(*animations), AnimationGroup(*create_persistent_animations()))
+
+        self.play(
+            AnimationGroup(*animations), AnimationGroup(*create_persistent_animations())
+        )
         self.remove(*avg_lines)
-        
+        self.wait(0.5)
+
         return
 
     def animate_label_assignment(self):
         """Animate the assignment of the labels to the dots."""
-        # Animate step emphasis
-        self.play(Indicate(self.step2_text))
-
         # Retrieve the labels again
         labels = self.get_labels()
 
@@ -192,8 +231,8 @@ class KMeansAlgo(Scene):
 
         return
 
-    def construct_animate_centroid_distance_lines(self, lag_ratio=0.065):
-        """Animate the line projections/retractions of the shortest lines to dots."""        
+    def construct_animate_centroid_distance_lines(self, lag_ratio=0.065, indicate_min=True):
+        """Animate the line projections/retractions of the shortest lines to dots."""
         # Get the labels for the dots
         temp_lines = []
         self.final_lines = []
@@ -223,8 +262,11 @@ class KMeansAlgo(Scene):
         self.play(LaggedStart(*line_animations, lag_ratio=lag_ratio))
 
         # Animate the retration of the shortest lines
-        self.play(Indicate(self.step2_equation[2], scale_factor=1.5))
+        if indicate_min:
+            self.play(Indicate(self.step2_equation[2], scale_factor=1.5))
+            self.wait(0.5)
         self.play(*[Uncreate(line) for line in temp_lines])
+        self.wait(0.4)
         return
 
     def construct_animate_centroid_init(self, step):
@@ -263,7 +305,7 @@ class KMeansAlgo(Scene):
         self.page_group.arrange(RIGHT, buff=0.4)
 
         self.page_group.to_edge(LEFT)
-        self.right_group.shift(RIGHT*0.75)
+        self.right_group.shift(RIGHT * 0.75)
 
         return
 
