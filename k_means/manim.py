@@ -106,26 +106,63 @@ class KMeansAlgo(Scene):
             self.wait(0.5)
             self.animate_centroid_position_update(i)
 
-
         self.animate_graph_centering()
-
-        # Fade all out
-        # self.wait(1)
-        # self.play(*[FadeOut(object) for object in self.mobjects])
+        self.wait(0.75)
+        
+        self.animate_polygon_boundaries()
+        self.wait(3)
+        
+        # Fade out remaining points
+        self.fade_remaining()
+        return
+    
+    def fade_remaining(self):
+        """Fade the remaining objects in the scene."""
+        self.play(
+            FadeOut(self.title_group),
+            FadeOut(self.graph_group),
+            FadeOut(self.polygons)
+        )
+        return
+    
+    def animate_polygon_boundaries(self):
+        """Animate boundaries of the centroids."""
+        final_centroid_points = self.centroid_history[-1, :, :2]
+        polygons_coords = get_polygons(final_centroid_points, [0, 5], [0, 5])
+        
+        print(len(polygons_coords))
+        self.polygons = VGroup()
+        for i, coords in enumerate(polygons_coords):
+            polygon_coords = []
+            for j in range(coords.shape[0]):
+                polygon_coords.append(self.graph.coords_to_point(*coords[j]))
+            polygon = Polygon(*polygon_coords, stroke_width=1.25, fill_opacity=0.3, fill_color=self.C_COLORS[i])
+            self.polygons.add(polygon)
+            
+        self.play(
+            LaggedStart(*[Write(polygon) for polygon in self.polygons], lag_ratio=0.15),
+            AnimationGroup(*[Indicate(dot, color=dot.get_color(), scale_factor=1) for dot in self.dots]),
+            AnimationGroup(*[Indicate(dot, color=dot.get_color(), scale_factor=1) for dot in self.centroids])
+        )
+        
         return
     
     def animate_graph_centering(self):
+        """Center the graph after the convergence."""
         self.graph_group = VGroup(
             self.graph,
             *self.dots,
             *self.centroids
         )
         
-        self.title_replacement = self.title_group.copy()
-        self.add(self.title_replacement)
+        # self.title_replacement = self.title_group.copy()
+        title_position = self.title_group.get_center_of_mass()
+        title_position[0] = 0
+        self.left_group.remove(self.title_group)
         
         self.play(
-            self.graph_group.animate.scale(1.25).move_to(ORIGIN),
+            self.title_group.animate.move_to(title_position),
+            self.graph_group.animate.scale(1.25).move_to(ORIGIN).shift(DOWN*0.2),
             *[FadeOut(object) for object in self.left_group],
             FadeOut(self.dividing_line)
         )
