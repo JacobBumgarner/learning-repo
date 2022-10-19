@@ -34,7 +34,7 @@ class KMeans:
 
         Attributes
         ----------
-        cluster_center : np.ndarray of shape (m_clusters, n_feature)
+        cluster_centers : np.ndarray of shape (m_clusters, n_feature)
             The centers to the fitted clusters
         labels : np.ndarray of shape (n_samples,)
             An array containing 0-index labels for each input data point.
@@ -102,6 +102,8 @@ class KMeans:
 
             self.centroid_history.append(centroids.copy())
 
+        self.labels = self._compute_labels(input_data, centroids)
+        self.cluster_centers = self.centroid_history[-1]
         return
 
     def _init_centroids_random(

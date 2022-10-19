@@ -14,6 +14,26 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 
+class KMeansFrameSelection(Scene):
+    def construct_parameters(self):
+        """Initialize the parameters for the animation."""
+        
+        return
+    
+    def construct(self):
+        """Consruct the scene."""
+        self.construct_parameters()
+        
+        return
+    
+    def animate(self):
+        """Animate the scene."""
+        
+        return
+    
+    
+
+
 class KMeansAlgo(Scene):
     def initialize_parameters(self):
         """Initialize the parameters for the animation."""
