@@ -1,29 +1,30 @@
 # Dance to import our logit model
 import os
 import sys
-from sre_constants import JUMP
 
 module_path = os.path.abspath(os.path.join("."))
 sys.path.append(module_path)
 
 from voronoi_processing import get_polygons
 
+# External imports
 from manimlib import *
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
 
+from skimage.io import imread, imsave
 
 class KMeansFrameSelection(Scene):
     def construct_parameters(self):
         """Initialize the parameters for the animation."""
+        self.bee_video = np.load("/Users/jacobbumgarner/Desktop/learning-repo/local_files/k_means/bees_original.npy")
         
         return
     
     def construct(self):
         """Consruct the scene."""
         self.construct_parameters()
-        
+        self.test_image()
         return
     
     def animate(self):
@@ -31,6 +32,16 @@ class KMeansFrameSelection(Scene):
         
         return
     
+    def test_image(self):
+        image = None
+        for i in range(75):
+            if image:
+                self.remove(image)
+            image_number = "%04d" % i
+            filename = "../local_files/k_means/bee_images/" + image_number + ".png"
+            image = ImageMobject(filename)
+            self.add(image)
+            self.wait(1/100)  # 100 fps
     
 
 
