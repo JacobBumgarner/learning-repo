@@ -6,7 +6,7 @@ directories:
   # Where should manim output video and image files?
   output: ""
   # If you want to use images, manim will look to these folders to find them
-  raster_images: ""
+  raster_images: "/Users/jacobbumgarner/Desktop/learning-repo/local_files/k_means/bee_images"
   vector_images: ""
   # If you want to use sounds, manim will look here to find it.
   sounds: ""

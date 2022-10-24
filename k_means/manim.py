@@ -9,41 +9,117 @@ from voronoi_processing import get_polygons
 
 # External imports
 from manimlib import *
+# from manim import *
 import numpy as np
 from scipy.spatial.distance import cdist
+import matplotlib.pyplot as plt
+import matplotlib.colors as clr
 
-from skimage.io import imread, imsave
+from PIL import Image
+import cv2
+
 
 class KMeansFrameSelection(Scene):
     def construct_parameters(self):
         """Initialize the parameters for the animation."""
-        self.bee_video = np.load("/Users/jacobbumgarner/Desktop/learning-repo/local_files/k_means/bees_original.npy")
-        
+        self.bee_video = np.load(
+            "/Users/jacobbumgarner/Desktop/learning-repo/local_files/k_means/bees_original.npy"
+        )
+        self.bee_pca = np.load("label_videos/bee_video_pca.npy")
         return
-    
+
     def construct(self):
         """Consruct the scene."""
         self.construct_parameters()
-        self.test_image()
+        self.construct_title()
+        self.construct_graph()
+        self.construct_PCA_box()
+        self.animate()
         return
-    
+
     def animate(self):
         """Animate the scene."""
+        self.play(Write(self.title_group))
+        self.play(Write(self.graph))
+        self.play(FadeIn(self.pca_group))
+        
+        # self.convert_frames_to_points([0, 100])
+        self.convert_frames_to_points([0, self.bee_pca.shape[0]])
+
+        return
+    
+    def construct_PCA_box(self):
+        self.box = Rectangle(3.5, 1.75, fill_color=BLACK, fill_opacity=1)
+        self.PCA_text = TexText("PCA \\\\ ${n_{components} = 2}$")
+        self.pca_group = VGroup(self.box, self.PCA_text).scale(0.6)
         
         return
     
-    def test_image(self):
-        image = None
-        for i in range(75):
-            if image:
-                self.remove(image)
-            image_number = "%04d" % i
-            filename = "../local_files/k_means/bee_images/" + image_number + ".png"
-            image = ImageMobject(filename)
-            self.add(image)
-            self.wait(1/100)  # 100 fps
+    def construct_graph(self):
+        self.graph = Axes([-5.25, 5.25, 1.5], [-4.25, 4.25, 1.7], width=5, height=4.5)
+        self.graph.shift(RIGHT*4)
+        return
     
+    def convert_frames_to_points(
+        self,
+        frame_range: list = [0, 300],
+    ):
+        """Animate the bee video via a construction of """
+        total_frames = frame_range[1] - frame_range[0]
+        
+        dot_animations = []
+        square_animations = []
+        dots = []
+        squares = []
+        
+        cmap = plt.get_cmap("plasma")
+        colors = cmap(np.linspace(0, 1, total_frames)) 
+        for i in range(*frame_range):
+            # print(f"Writing frame: {i-frame_range[0]}/{total_frames}", end="\r")
+            
+            if i % 40 == 0:
+                image_number = "%04d" % i
+                filename = image_number + ".png"
+                square = ImageMobject(filename).scale(0.5).shift(LEFT*4)
+                # square = Square(fill_color=GREY, fill_opacity=1, stroke_width=1).shift(LEFT*4)
+                squares.append(square)
+                
+                animation = square.animate.move_to(self.pca_group.get_left()).scale(0)
+                square_animations.append(animation)
+            
+            coord = self.bee_pca[i] / 1000
+            point = self.graph.coords_to_point(*coord)
+            
+            dot = Dot(self.pca_group.get_right(), color=clr.to_hex(colors[i]), radius=0.04)
+            dots.append(dot)
+            dot_animations.append(dot.animate.move_to(point))
 
+        square_animations.reverse()
+        self.add(self.pca_group)
+        self.play(
+            Indicate(self.pca_group, scale_factor=1), 
+            LaggedStart(
+                LaggedStart(*square_animations, lag_ratio=5/len(squares)), 
+                LaggedStart(*dot_animations, lag_ratio=5/len(dots)), 
+                lag_ratio=0.1
+            )
+            )
+        
+        self.remove(*squares)
+        return
+
+    def construct_title(self):
+        self.title = Text("K-Means for Video Keyframe Extraction").scale(0.8).to_edge(UP)
+        self.title.shift(UP*0.2)
+        
+        line_left = LEFT_SIDE + [0.5, 0, 0]
+        line_left[1] = self.title.get_bottom()[1] * 0.95
+        line_right = RIGHT_SIDE - [0.5, 0, 0]
+        line_right[1] = self.title.get_bottom()[1] * 0.95
+        self.title_underline = Line(line_left, line_right, color=WHITE, stroke_width=2)
+        
+        self.title_group = VGroup(self.title, self.title_underline)
+        return
 
 class KMeansAlgo(Scene):
     def initialize_parameters(self):
@@ -106,7 +182,7 @@ class KMeansAlgo(Scene):
         self.play(Write(self.step2_equation[:]))
         self.wait(0.5)
         self.construct_animate_centroid_distance_lines()
-        
+
         self.play(Indicate(self.step2_text))
         self.wait(0.5)
         self.animate_label_assignment()
@@ -126,76 +202,85 @@ class KMeansAlgo(Scene):
         for i in range(2, self.centroid_history.shape[0]):
             if i != 2:
                 self.play(Indicate(self.step4_text, scale_factor=1.25))
-            
+
             self.construct_animate_centroid_distance_lines(lag_ratio=0.025)
-            
+
             self.play(Indicate(self.step2_text))
             self.wait(0.5)
             self.animate_label_assignment()
-            
+
             self.play(Indicate(self.step3_text, scale_factor=1.5))
             self.wait(0.5)
             self.animate_centroid_position_update(i)
 
         self.animate_graph_centering()
         self.wait(0.75)
-        
+
         self.animate_polygon_boundaries()
         self.wait(3)
-        
+
         # Fade out remaining points
         self.fade_remaining()
         return
-    
+
     def fade_remaining(self):
         """Fade the remaining objects in the scene."""
         self.play(
-            FadeOut(self.title_group),
-            FadeOut(self.graph_group),
-            FadeOut(self.polygons)
+            FadeOut(self.title_group), FadeOut(self.graph_group), FadeOut(self.polygons)
         )
         return
-    
+
     def animate_polygon_boundaries(self):
         """Animate boundaries of the centroids."""
         final_centroid_points = self.centroid_history[-1, :, :2]
         polygons_coords = get_polygons(final_centroid_points, [0, 5], [0, 5])
-        
+
         print(len(polygons_coords))
         self.polygons = VGroup()
         for i, coords in enumerate(polygons_coords):
             polygon_coords = []
             for j in range(coords.shape[0]):
                 polygon_coords.append(self.graph.coords_to_point(*coords[j]))
-            polygon = Polygon(*polygon_coords, stroke_width=1.25, fill_opacity=0.3, fill_color=self.C_COLORS[i])
+            polygon = Polygon(
+                *polygon_coords,
+                stroke_width=1.25,
+                fill_opacity=0.3,
+                fill_color=self.C_COLORS[i],
+            )
             self.polygons.add(polygon)
-            
+
         self.play(
             LaggedStart(*[Write(polygon) for polygon in self.polygons], lag_ratio=0.15),
-            AnimationGroup(*[Indicate(dot, color=dot.get_color(), scale_factor=1) for dot in self.dots]),
-            AnimationGroup(*[Indicate(dot, color=dot.get_color(), scale_factor=1) for dot in self.centroids])
+            AnimationGroup(
+                *[
+                    Indicate(dot, color=dot.get_color(), scale_factor=1)
+                    for dot in self.dots
+                ]
+            ),
+            AnimationGroup(
+                *[
+                    Indicate(dot, color=dot.get_color(), scale_factor=1)
+                    for dot in self.centroids
+                ]
+            ),
         )
-        
+
         return
-    
+
     def animate_graph_centering(self):
         """Center the graph after the convergence."""
-        self.graph_group = VGroup(
-            self.graph,
-            *self.dots,
-            *self.centroids
-        )
-        
+        self.graph_group = VGroup(self.graph, *self.dots, *self.centroids)
+
         # self.title_replacement = self.title_group.copy()
         title_position = self.title_group.get_center_of_mass()
         title_position[0] = 0
         self.left_group.remove(self.title_group)
-        
+
         self.play(
             self.title_group.animate.move_to(title_position),
-            self.graph_group.animate.scale(1.25).move_to(ORIGIN).shift(DOWN*0.2),
+            self.graph_group.animate.scale(1.25).move_to(ORIGIN).shift(DOWN * 0.2),
             *[FadeOut(object) for object in self.left_group],
-            FadeOut(self.dividing_line)
+            FadeOut(self.dividing_line),
         )
         return
 
@@ -299,7 +384,9 @@ class KMeansAlgo(Scene):
 
         return
 
-    def construct_animate_centroid_distance_lines(self, lag_ratio=0.065, indicate_min=True):
+    def construct_animate_centroid_distance_lines(
+        self, lag_ratio=0.065, indicate_min=True
+    ):
         """Animate the line projections/retractions of the shortest lines to dots."""
         # Get the labels for the dots
         temp_lines = []
