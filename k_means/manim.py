@@ -9,17 +9,13 @@ from voronoi_processing import get_polygons
 
 # External imports
 from manimlib import *
-# from manim import *
+import matplotlib.colors as clr
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
-import matplotlib.pyplot as plt
-import matplotlib.colors as clr
+  
 
-from PIL import Image
-import cv2
-
-
-class KMeansFrameSelection(Scene):
+class KMeansFrameSelection_0(Scene):
     def construct_parameters(self):
         """Initialize the parameters for the animation."""
         self.bee_video = np.load(
@@ -29,104 +25,222 @@ class KMeansFrameSelection(Scene):
         return
 
     def construct(self):
-        """Consruct the scene."""
         self.construct_parameters()
         self.construct_title()
-        self.construct_graph()
-        self.construct_PCA_box()
+        self.construct_text()
         self.animate()
         return
-
+    
     def animate(self):
-        """Animate the scene."""
         self.play(Write(self.title_group))
-        self.play(Write(self.graph))
-        self.play(FadeIn(self.pca_group))
-        
-        # self.convert_frames_to_points([0, 100])
-        self.convert_frames_to_points([0, self.bee_pca.shape[0]])
-
+        self.wait(1)
+        self.play(Write(self.text_1[:]))
+        self.wait(1)
+        self.play(FadeOut(self.text_1))
+        self.play(Write(self.text_2[:]))
+        self.wait(1)
+        self.play(FadeOut(self.text_2))
         return
     
-    def construct_PCA_box(self):
-        self.box = Rectangle(3.5, 1.75, fill_color=BLACK, fill_opacity=1)
-        self.PCA_text = TexText("PCA \\\\ ${n_{components} = 2}$")
-        self.pca_group = VGroup(self.box, self.PCA_text).scale(0.6)
+    def construct_text(self):
+        self.text_1 = TexText(
+            """
+            Goal: Identify unique keyframes from the video
+            for manual feature labeling.
+            """
+        ).scale(0.8).to_edge(DOWN)
         
-        return
-    
-    def construct_graph(self):
-        self.graph = Axes([-5.25, 5.25, 1.5], [-4.25, 4.25, 1.7], width=5, height=4.5)
-        self.graph.shift(RIGHT*4)
-        return
-    
-    def convert_frames_to_points(
-        self,
-        frame_range: list = [0, 300],
-    ):
-        """Animate the bee video via a construction of """
-        total_frames = frame_range[1] - frame_range[0]
-        
-        dot_animations = []
-        square_animations = []
-        dots = []
-        squares = []
-        
-        cmap = plt.get_cmap("plasma")
-        colors = cmap(np.linspace(0, 1, total_frames)) 
-        for i in range(*frame_range):
-            # print(f"Writing frame: {i-frame_range[0]}/{total_frames}", end="\r")
-            
-            if i % 40 == 0:
-                image_number = "%04d" % i
-                filename = image_number + ".png"
-                square = ImageMobject(filename).scale(0.5).shift(LEFT*4)
-                # square = Square(fill_color=GREY, fill_opacity=1, stroke_width=1).shift(LEFT*4)
-                squares.append(square)
-                
-                animation = square.animate.move_to(self.pca_group.get_left()).scale(0)
-                square_animations.append(animation)
-            
-            coord = self.bee_pca[i] / 1000
-            point = self.graph.coords_to_point(*coord)
-            
-            dot = Dot(self.pca_group.get_right(), color=clr.to_hex(colors[i]), radius=0.04)
-            dots.append(dot)
-            dot_animations.append(dot.animate.move_to(point))
-
-        square_animations.reverse()
-        self.add(self.pca_group)
-        self.play(
-            Indicate(self.pca_group, scale_factor=1), 
-            LaggedStart(
-                LaggedStart(*square_animations, lag_ratio=5/len(squares)), 
-                LaggedStart(*dot_animations, lag_ratio=5/len(dots)), 
-                lag_ratio=0.1
-            )
-            )
-        
-        self.remove(*squares)
+        self.text_2 = TexText(
+            """
+            The labeled keyframes will be used to
+            train convolutional neural networks
+            for automated point tracking.
+            """
+        ).scale(0.8).to_edge(DOWN).shift(DOWN*0.2)
         return
 
     def construct_title(self):
-        self.title = Text("K-Means for Video Keyframe Extraction").scale(0.8).to_edge(UP)
-        self.title.shift(UP*0.2)
-        
+        self.title = (
+            Text("K-Means for Video Keyframe Extraction").scale(0.8).to_edge(UP)
+        )
+        self.title.shift(UP * 0.2)
+
         line_left = LEFT_SIDE + [0.5, 0, 0]
         line_left[1] = self.title.get_bottom()[1] * 0.95
         line_right = RIGHT_SIDE - [0.5, 0, 0]
         line_right[1] = self.title.get_bottom()[1] * 0.95
         self.title_underline = Line(line_left, line_right, color=WHITE, stroke_width=2)
-        
+
         self.title_group = VGroup(self.title, self.title_underline)
         return
+
+
+class KMeansFrameSelection_1(KMeansFrameSelection_0):
+    def load_previous_scene(self):
+        # Get the title from scene 0
+        self.add(self.title_group)
+        return
+
+    def construct(self, active_scene=True):
+        """Construct the scene."""
+        super().construct()
+        if active_scene:
+            self.load_previous_scene()
+
+        self.frame_range = [0, 20]
+        self.frame_range = [0, self.bee_pca.shape[0]]
+
+        self.construct_PCA_box()
+        self.construct_PCA_text()
+        self.construct_dots()
+        self.construct_graph(pre_animation=active_scene)
+        self.animate()
+        return
+
+    def animate(self):
+        """Animate the scene."""
+        self.play(LaggedStart(Write(self.PCA_group), Write(self.graph), lag_ratio=0.5))
+        self.play(Write(self.PCA_text[:]))
+        self.wait(1)
+        self.play(Indicate(self.PCA_group, scale_factor=1.2, color=WHITE))
+        self.wait(0.25)
+
+        # Animate frame conversion
+        self.convert_frames_to_points(self.frame_range)
+        self.play(FadeOut(self.PCA_group), FadeOut(self.PCA_text))
+
+        # Center the graph
+        self.animate_graph_centering()
+        return
+
+    def center_graph(self):
+        self.graph_group.move_to(ORIGIN).scale(1.15)
+        return
+
+    def animate_graph_centering(self):
+        # need to keep the graph group on top... how?
+        self.play(self.graph_group.animate.move_to(ORIGIN).scale(1.15))
+        return
+
+    def convert_frames_to_points(self, frame_range: list = [0, 300]):
+        """Animate the bee video via a construction of"""
+        frames = []
+        frame_animations = []
+
+        dot_animations = []
+        dot_index = 0
+
+        for i in range(*frame_range):
+            if i % 40 == 0 or i == (frame_range[1] - 1):
+                # if i % 2 == 0:
+                image_number = "%04d" % i
+                filename = image_number + ".png"
+                frame = ImageMobject(filename).scale(0.5).shift(LEFT * 4)
+                frames.append(frame)
+                animation = frame.animate.move_to(self.PCA_group.get_left()).scale(0)
+                frame_animations.append(animation)
+
+            # don't want the values up at 5000 - manim doesn't like large graphs.
+            coord = self.bee_pca[i] / 1000
+            point = self.graph.coords_to_point(*coord)
+            dot_animations.append(self.dots[dot_index].animate.move_to(point))
+            dot_index += 1
+
+        # Add the frames in reverse order
+        self.add(*frames)
+        dot_copy = self.PCA_dot.copy()
+        dot_animations.append(FadeOut(dot_copy))
+
+        # Animate
+        self.play(
+            LaggedStart(
+                LaggedStart(*frame_animations, lag_ratio=5 / len(frames)),
+                LaggedStart(*dot_animations, lag_ratio=5 / len(self.dots)),
+                lag_ratio=0.1,
+            )
+        )
+
+        self.remove(*frames)
+        return
+
+    def construct_graph(self, pre_animation=True):
+        self.graph = Axes([-5.25, 5.25, 1.5], [-4.25, 4.25, 1.7], width=5, height=4.5)
+        self.graph.shift(RIGHT * 4)
+
+        # update dot positions
+        if not pre_animation:
+            for i, dot in zip(range(*self.frame_range), self.dots):
+                coord = self.bee_pca[i] / 1000
+                position = self.graph.coords_to_point(*coord)
+                dot.move_to(position)
+
+        self.graph_group = VGroup()
+        self.graph_group.add(self.graph, *self.dots)
+        return
+
+    def construct_dots(self):
+        total_frames = self.frame_range[1] - self.frame_range[0]
+
+        self.dots = []
+
+        cmap = plt.get_cmap("plasma")
+        colors = cmap(np.linspace(0, 1, total_frames))
+
+        for i in range(*self.frame_range):
+            position = self.box.get_right()
+            dot = Dot(position, color=clr.to_hex(colors[i]), radius=0.04)
+            self.dots.append(dot)
+
+        return
+
+    def construct_PCA_text(self):
+        self.PCA_text = TexText(
+            """
+                First, reduce the dimensionality of the video\\\\
+                frames using principal component analysis.
+            """
+        ).scale(0.7)
+        self.PCA_text.to_edge(DOWN)
+        return
+
+    def construct_PCA_box(self):
+        self.box = Rectangle(3.65, 1.75)
+        self.PCA_text = TexText("PCA \\\\ ${n_{components} = 2}$")
+        self.PCA_group = VGroup(self.box, self.PCA_text).scale(0.6)
+        self.PCA_square = Square(0.1, fille_color=WHITE, fill_opacity=1).move_to(
+            self.box.get_left()
+        )
+        self.PCA_dot = Dot(self.box.get_right(), color=WHITE, radius=0.05)
+        self.PCA_group.add(self.PCA_dot, self.PCA_square)
+        return
+
+
+class KMeansFrameSelection_2(KMeansFrameSelection_1):
+    def load_previous_scene(self):
+        self.add(self.title_group)
+        # self.add(self.graph_group)
+        self.play(FadeIn(self.graph))
+        self.play(*[FadeIn(dot) for dot in self.dots])
+        self.animate_graph_centering()
+        return
+
+    def construct(self, active_scene=True):
+        super().construct(active_scene=False)
+        if active_scene:
+            self.load_previous_scene()
+
+        return
+
+    def animate(self):
+
+        return
+
 
 class KMeansAlgo(Scene):
     def initialize_parameters(self):
         """Initialize the parameters for the animation."""
         self.data = np.load("data/synth_data.npy")
         self.data = np.pad(self.data, ((0, 0), (0, 1)))  # manim needs 3D coordinates
-        # self.centroid_history = np.load(" lf.centroid_history, ((0, 0), (0, 0), (0, 1)))
         self.centroid_history = np.load("data/centroid_original_history.npy")
         self.centroid_history = np.pad(self.centroid_history, ((0, 0), (0, 0), (0, 1)))
         self.centroids = []
