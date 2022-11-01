@@ -10,11 +10,11 @@ def interpolate_centroid_history(
     switch_buffer: int = 0,
 ):
     """Interpolate a centroid path at 30fps for a desired frame count."""
+    # get the number of frames needed between each keyframe
     frame_counts = np.linspace(0, frames, len(centroids_history), dtype=np.int_)
     frame_counts = frame_counts[1:] - frame_counts[:-1]
-
-    # if front_pad:
-
+    
+    # interpolate the frames between each keyframe and add to the list
     interpolated_history = []
     for i in range(len(centroids_history) - 1):
         if switch_buffer:

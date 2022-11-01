@@ -15,6 +15,57 @@ import numpy as np
 from scipy.spatial.distance import cdist
   
 
+class KMeansTest(Scene):
+    def initialize_parameters(self):
+        self.history = np.load("label_videos/interpolated_centroid_history.npy")
+        self.history /= 1000
+        cmap = plt.get_cmap("jet")
+        colors = cmap(np.linspace(0, 1, self.history.shape[1]))
+        self.colors = [clr.to_hex(color) for color in colors]
+        return 
+    
+    def construct(self):
+        self.initialize_parameters()
+        self.construct_graph()
+        self.construct_polygons()
+        self.animate()
+        return
+        
+    def animate(self):
+        self.animate_polygons()
+        for i in range(9):
+            for step in range(30):
+                self.animate_polygon_update(step + (30 * i))
+        
+        return
+    
+    def animate_polygon_update(self, step):
+        self.remove(*self.polygons)
+        self.construct_polygons(step)
+        self.add(*self.polygons)
+        self.wait(1/30)
+        return
+    
+    def animate_polygons(self):
+        self.play(*[Write(polygon) for polygon in self.polygons])
+        return
+    
+    def construct_polygons(self, step=0):
+        self.polygons = []
+        
+        polygons_coords = get_polygons(self.history[step], [-6, 6], [-6, 6])
+        for i, coords in enumerate(polygons_coords):
+            updated_coords = [self.graph.coords_to_point(*point) for point in coords]
+            polygon = Polygon(*updated_coords, fill_color=self.colors[i], fill_opacity=0.5)
+            self.polygons.append(polygon)
+        return
+    
+    def construct_graph(self):
+        self.graph = Axes([-6, 6], [-6, 6], width=5, height=5)
+        self.add(self.graph)
+        return
+    
+
 class KMeansFrameSelection_0(Scene):
     def construct_parameters(self):
         """Initialize the parameters for the animation."""
