@@ -28,7 +28,7 @@ tex:
 universal_import_line: "from manimlib import *"
 style:
   font: "CMU Serif"
-  text_alignment: "center"
+  text_alignment: "LEFT"
   background_color: "#000000"
 # Set the position of preview window, you can use directions, e.g. UL/DR/OL/OO/...
 # also, you can also specify the position(pixel) of the upper left corner of 

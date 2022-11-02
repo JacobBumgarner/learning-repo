@@ -13,77 +13,38 @@ import matplotlib.colors as clr
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
-  
 
-class KMeansTest(Scene):
-    def initialize_parameters(self):
-        self.history = np.load("label_videos/interpolated_centroid_history.npy")
-        self.history /= 1000
-        cmap = plt.get_cmap("jet")
-        colors = cmap(np.linspace(0, 1, self.history.shape[1]))
-        self.colors = [clr.to_hex(color) for color in colors]
-        return 
-    
+
+class twox(Scene):
     def construct(self):
-        self.initialize_parameters()
-        self.construct_graph()
-        self.construct_polygons()
-        self.animate()
+        text = TexText("3x")
+        speed = Speedometer(num_ticks=0)
+        speed.needle.set_color(RED)
+        speed.scale(text.get_height()/speed.get_height())
+        group = VGroup(speed, text).arrange(RIGHT)
+        group.to_edge(DOWN)
+        self.play(Write(group[:]))
+        self.wait(1)
+        self.play(FadeOut(group))
         return
-        
-    def animate(self):
-        self.animate_polygons()
-        for i in range(9):
-            for step in range(30):
-                self.animate_polygon_update(step + (30 * i))
-        
-        return
-    
-    def animate_polygon_update(self, step):
-        self.remove(*self.polygons)
-        self.construct_polygons(step)
-        self.add(*self.polygons)
-        self.wait(1/30)
-        return
-    
-    def animate_polygons(self):
-        self.play(*[Write(polygon) for polygon in self.polygons])
-        return
-    
-    def construct_polygons(self, step=0):
-        self.polygons = []
-        
-        polygons_coords = get_polygons(self.history[step], [-6, 6], [-6, 6])
-        for i, coords in enumerate(polygons_coords):
-            updated_coords = [self.graph.coords_to_point(*point) for point in coords]
-            polygon = Polygon(*updated_coords, fill_color=self.colors[i], fill_opacity=0.5)
-            self.polygons.append(polygon)
-        return
-    
-    def construct_graph(self):
-        self.graph = Axes([-6, 6], [-6, 6], width=5, height=5)
-        self.add(self.graph)
-        return
-    
 
 class KMeansFrameSelection_0(Scene):
-    def construct_parameters(self):
+    def initialize_parameters_0(self):
         """Initialize the parameters for the animation."""
         self.bee_video = np.load(
             "/Users/jacobbumgarner/Desktop/learning-repo/local_files/k_means/bees_original.npy"
         )
-        self.bee_pca = np.load("label_videos/bee_video_pca.npy")
         return
 
     def construct(self, active_scene=True):
-        self.construct_parameters()
+        self.initialize_parameters_0()
         self.construct_title()
         self.construct_text()
-        
+
         if active_scene:
             self.animate()
         return
-    
+
     def animate(self):
         self.play(Write(self.title_group))
         self.wait(1)
@@ -94,22 +55,31 @@ class KMeansFrameSelection_0(Scene):
         self.wait(1)
         self.play(FadeOut(self.text_2))
         return
-    
+
     def construct_text(self):
-        self.text_1 = TexText(
-            """
+        self.text_1 = (
+            TexText(
+                """
             Goal: Identify unique keyframes from the video
             for manual feature labeling.
             """
-        ).scale(0.8).to_edge(DOWN)
-        
-        self.text_2 = TexText(
-            """
+            )
+            .scale(0.8)
+            .to_edge(DOWN)
+        )
+
+        self.text_2 = (
+            TexText(
+                """
             The labeled keyframes will be used to
             train convolutional neural networks
             for automated point tracking.
             """
-        ).scale(0.8).to_edge(DOWN).shift(DOWN*0.2)
+            )
+            .scale(0.8)
+            .to_edge(DOWN)
+            .shift(DOWN * 0.2)
+        )
         return
 
     def construct_title(self):
@@ -129,6 +99,11 @@ class KMeansFrameSelection_0(Scene):
 
 
 class KMeansFrameSelection_1(KMeansFrameSelection_0):
+    def initialize_parameters_1(self):
+        self.bee_pca = np.load("label_videos/bee_video_pca.npy")
+        self.bee_pca /= 1000
+        return
+
     def load_previous_scene(self):
         # Get the title from scene 0
         self.add(self.title_group)
@@ -137,6 +112,7 @@ class KMeansFrameSelection_1(KMeansFrameSelection_0):
     def construct(self, active_scene=True):
         """Construct the scene."""
         super().construct(active_scene=False)
+        self.initialize_parameters_1()
         if active_scene:
             self.load_previous_scene()
 
@@ -147,7 +123,7 @@ class KMeansFrameSelection_1(KMeansFrameSelection_0):
         self.construct_PCA_text()
         self.construct_dots()
         self.construct_graph(pre_animation=active_scene)
-        
+
         if active_scene:
             self.animate()
         return
@@ -196,7 +172,7 @@ class KMeansFrameSelection_1(KMeansFrameSelection_0):
                 frame_animations.append(animation)
 
             # don't want the values up at 5000 - manim doesn't like large graphs.
-            coord = self.bee_pca[i] / 1000
+            coord = self.bee_pca[i]
             point = self.graph.coords_to_point(*coord)
             dot_animations.append(self.dots[dot_index].animate.move_to(point))
             dot_index += 1
@@ -225,7 +201,7 @@ class KMeansFrameSelection_1(KMeansFrameSelection_0):
         # update dot positions
         if not pre_animation:
             for i, dot in zip(range(*self.frame_range), self.dots):
-                coord = self.bee_pca[i] / 1000
+                coord = self.bee_pca[i]
                 position = self.graph.coords_to_point(*coord)
                 dot.move_to(position)
 
@@ -243,7 +219,7 @@ class KMeansFrameSelection_1(KMeansFrameSelection_0):
 
         for i in range(*self.frame_range):
             position = self.box.get_right()
-            dot = Dot(position, color=clr.to_hex(colors[i]), radius=0.04)
+            dot = Dot(position, color=clr.to_hex(colors[i]), radius=0.03)
             self.dots.append(dot)
 
         return
@@ -271,36 +247,11 @@ class KMeansFrameSelection_1(KMeansFrameSelection_0):
 
 
 class KMeansFrameSelection_2(KMeansFrameSelection_1):
-    def initialize_parameters(self):
+    def initialize_parameters_2(self):
         self.DOT_COLOR = "#a7b8c7"
-        self.centroid_history = np.load("label_videos/centroid_history.npy")
-        self.centroid_history = np.pad(self.centroid_history, ((0, 0), (0, 0), (0, 1)))
-
-        cmap = plt.get_cmap("rainbow")
-        colors = cmap(np.linspace(0, 1, self.centroid_history.shape[1]))
-        colors = np.flip(colors, axis=0)
-        self.C_COLORS = [clr.to_hex(colors[i]) for i in range(len(colors))]
-        
-        hsv = clr.rgb_to_hsv(colors[..., :3])
-        hsv_alterations = np.full(self.centroid_history.shape[1], 0.2)
-        # hsv_alterations[[0, 7]] += 0.1
-        hsv[:, 1] -= hsv_alterations
-        dot_colors = clr.hsv_to_rgb(hsv)
-        self.D_COLORS = [clr.to_hex(dot_colors[i]) for i in range(len(dot_colors))]
-        
         return
-    
-    def get_labels(self):
-        """Return an array with the centroid labels for each dot based on proximity."""
-        dot_positions = np.array([dot.get_center() for dot in self.dots])
-        centroid_positions = np.array([c.get_center() for c in self.centroids])
 
-        distances = cdist(dot_positions, centroid_positions)
-        labels = np.argmin(distances, axis=1)
-
-        return labels
-    
-    def load_previous_scene(self):
+    def load_previous_scene_1(self):
         self.add(self.title_group)
         self.add(self.graph)
         self.add(*self.dots)
@@ -309,184 +260,241 @@ class KMeansFrameSelection_2(KMeansFrameSelection_1):
 
     def construct(self, active_scene=True):
         super().construct(active_scene=False)
-        
-        self.initialize_parameters()
-        if active_scene:
-            self.load_previous_scene()
+
+        self.initialize_parameters_2()
+        self.load_previous_scene_1()
 
         self.construct_text()
-        self.construct_centroids()
-        self.dots = self.dots[:-1:20]
 
-        self.animate()
+        if active_scene:
+            self.animate()
+        else:
+            self.grayout_dots()
         return
 
     def animate(self):
-        self.animate_dot_grayout()
         self.play(Write(self.text[:]))
-        
-        self.animate_centroid_init()
-        self.wait(1)
-        
-        # for i in range(1, self.centroid_history.shape[0]):
-        for i in range(1, 6):
-            self.construct_animate_centroid_distance_lines()
-            self.animate_label_assignment()
-            self.animate_centroid_position_update(i)
-            self.wait(0.25)
-            
-        self.animate_centroid_fade()  # also fades text
+        self.wait(0.5)
+        self.animate_dot_grayout()
+
+        self.play(FadeOut(self.text))
         return
-    
-    def animate_centroid_fade(self):
+
+    def construct_text(self):
+        self.text = (
+            TexText(
+                """
+                Second, cluster the data using k-means to find groups of unique keyframes.\\\\
+            """
+            )
+            .scale(0.8)
+            .to_edge(DOWN)
+            .shift(DOWN * 0.2)
+        )
+        return
+
+    def grayout_dots(self):
+        for dot in self.dots:
+            dot.set_color(self.DOT_COLOR)
+        return
+
+    def animate_dot_grayout(self):
         animations = []
+        dot_runtime = 0.2
+        for dot in self.dots:
+            animations.append(FadeToColor(dot, self.DOT_COLOR, run_time=dot_runtime))
+
+        # lagged_start runtime:
+        #   total_runtime = runtime + (#_objects * lag_ratio * runtime)
+        # solve for lag_ratio
+        total_runtime = 3
+        self.play(
+            LaggedStart(
+                *animations,
+                lag_ratio=(total_runtime - dot_runtime)
+                / (len(self.dots) * dot_runtime),
+            )
+        )
+        return
+
+
+class KMeansFrameSelection_3(KMeansFrameSelection_2):
+    def initialize_parameters(self):
+        self.centroid_history = np.load(
+            "label_videos/interpolated_centroid_history.npy"
+        )
+        self.centroid_history /= 1000
+
+        cmap = plt.get_cmap("jet")
+        colors = cmap(np.linspace(0, 1, self.centroid_history.shape[1]))
+        self.colors = [clr.to_hex(color) for color in colors]
+
+        cmap = plt.get_cmap("rainbow")
+        colors = cmap(np.linspace(0, 1, self.centroid_history.shape[1]))
+        colors = np.flip(colors, axis=0)
+        self.C_COLORS = [clr.to_hex(colors[i]) for i in range(len(colors))]
+
+        hsv = clr.rgb_to_hsv(colors[..., :3])
+        hsv_alterations = np.full(self.centroid_history.shape[1], 0.3)
+        hsv_alterations[[0, 4, 7]] += 0.1
+        hsv_alterations[[5]] += 0.2
+        hsv_alterations[[3]] -= 0.1
+        hsv[:, 1] -= hsv_alterations
+        dot_colors = clr.hsv_to_rgb(hsv)
+        self.D_COLORS = [clr.to_hex(dot_colors[i]) for i in range(len(dot_colors))]
+        return
+
+    def get_labels(self, step=0):
+        """Return an array with the centroid labels for each dot based on proximity."""
+        # dot_positions = np.array([dot.get_center() for dot in self.dots])
+        # centroid_positions = np.array([c.get_center() for c in self.centroids])
+
+        distances = cdist(self.bee_pca, self.centroid_history[step])
+        labels = np.argmin(distances, axis=1)
+
+        return labels
+
+    # First create centroid persistant animations
+    def create_persistent_animations(self, centroids_only=False):
+        animations = []  # keeps centroids above lines
+
+        if not centroids_only:
+            for dot in self.dots:
+                animations.append(dot.animate.set_color(dot.get_color()))
         for centroid in self.centroids:
-            animation = centroid.animate.scale(0)
-            animations.append(animation)
-        
-        self.play(*animations, FadeOut(self.text))
-        self.remove(*self.centroids)
+            animations.append(centroid.animate.set_color(centroid.get_color()))
+
+        return AnimationGroup(*animations)
+
+    def construct(self, active_scene=True):
+        super().construct(active_scene=False)
+
+        self.initialize_parameters()
+
+        self.construct_text()
+        self.construct_algorithm_group()
+        self.construct_centroids()
+        self.construct_polygons()
+
+        if active_scene:
+            self.animate()
+        return
+
+    def animate(self):
+        self.play(Write(self.text[:]))
+        self.play(Write(self.algo_group[:]))
+        self.animate_algorithm_step(0)
+        self.animate_centroid_init()
+        self.play(FadeOut(self.text))
+
+        for i in range(1, 7):
+            # animate label assignment
+            self.animate_algorithm_step(1)
+            self.wait(0.25)
+            if i == 1:
+                self.animate_polygons()
+            self.animate_label_assignment((i-1)*30)
+            self.wait(0.25)
+
+            # animate centroid position updates
+            self.animate_algorithm_step(2)
+            self.wait(0.25)
+            self.animate_centroid_position_line_draw(i*30)
+            self.wait(0.25)
+            for j in range(30):
+                step = j + (i-1) * 30
+                self.animate_centroid_position_update(step)
+            self.animate_centroid_position_line_fade()
+
+            self.animate_algorithm_step(3)
+
+        self.play(FadeOut(self.algo_group, LEFT), FadeOut(self.box, LEFT))
+        self.play(LaggedStart(*[Uncreate(polygon) for polygon in self.polygons], lag_ratio=2/8), self.create_persistent_animations())
+        self.play(*[FadeOut(centroid, scale=0) for centroid in self.centroids])
+        return
+
+    def animate_centroid_position_update(self, step):
+        self.remove(*self.polygons, *self.centroids)
+        self.construct_polygons(step)
+        self.construct_centroids(step)
+        self.add(*self.polygons, *self.dots, *self.centroids)
+        self.wait(1 / 30)
         return
     
-    # First create centroid persistant animations
-    def create_persistent_animations(self):
-        animations = []  # keeps centroids above lines
-        for i, centroid in enumerate(self.centroids):
+    def animate_centroid_position_line_fade(self):
+        animations = []
+        for line in self.avg_lines:
+            animation = line.animate.put_start_and_end_on(
+                line.get_end(), line.get_end()
+            )
+            animations.append(animation)
 
-            color_animation = centroid.animate.set_color(self.C_COLORS[i])
-            animations.append(color_animation)
-
-        return animations
-    
-    def animate_centroid_position_update(self, step):
+        self.play(
+            AnimationGroup(*animations),
+            self.create_persistent_animations(),
+        )
+        self.remove(*self.avg_lines)        
+        return
+        
+    def animate_centroid_position_line_draw(self, step):
         """Animate the update to the centroid positions."""
-        new_positions = self.centroid_history[step] / 1000
+        ### IMPORTANT ###
+        # I interpolated one second of frames at 30 fps between the original
+        # centroid positions. 
+        # This means that i * 30 for i in range(original_hist.shape[0]) matches
+        # the location of the original positions
+        ### IMPORTANT ###
+        new_positions = self.centroid_history[step]
         new_positions = [
             self.graph.coords_to_point(*position) for position in new_positions
         ]
 
-        # First animate lines from the dots to the new averaged position
+        # Aline lines from the dots to the new averaged position
         labels = self.get_labels()
-        avg_lines = []
+        self.avg_lines = []
         for i, dot in enumerate(self.dots):
             label = labels[i]
             line = Line(
                 dot.get_center(),
                 new_positions[label],
                 color=self.D_COLORS[label],
-                stroke_width=1,
+                stroke_width=0.5,
             )
-
-            avg_lines.append(line)
+            self.avg_lines.append(line)
 
         self.play(
-            AnimationGroup(*[Write(line) for line in avg_lines]),
-            AnimationGroup(*self.create_persistent_animations()),
-            run_time=0.5
-        )  # play lines first
-        # self.wait(0.3)
-
-        # then move the centroids to the new position
-        centroid_animations = []
-        for i, centroid in enumerate(self.centroids):
-            animation = centroid.animate.move_to(new_positions[i])
-            centroid_animations.append(animation)
-        self.play(*centroid_animations)
-        # self.wait(0.3)
-
-        # Lastly, get rid of the lines, animate them all into the new centroid
-        animations = []
-        for line in avg_lines:
-            animation = line.animate.put_start_and_end_on(
-                line.get_end(), line.get_end()
-            )
-            animations.append(animation)
-
-        self.play(
-            AnimationGroup(*animations), AnimationGroup(*self.create_persistent_animations(), run_time=0.5)
+            AnimationGroup(*[Write(line) for line in self.avg_lines]),
+            self.create_persistent_animations(),
+            # run_time=0.5,
         )
-        self.remove(*avg_lines)
-        # self.wait(0.5)
-
         return
 
-    def animate_label_assignment(self):
-        """Animate the assignment of the labels to the dots."""
-        # Retrieve the labels again
-        labels = self.get_labels()
-
-        # Animate the color shift of all of the labels
-        dot_animations = []
-        for i, dot in enumerate(self.dots):
-            label = labels[i]
-            animation = dot.animate.set_color(self.D_COLORS[label])
-            dot_animations.append(animation)
-
-        # Then animate the projection of the final lines into each dot.
-        # The "end" of each line should be at the dots because of how they were created
-        line_animations = []
-        for line in self.final_lines:
-            animation = line.animate.put_start_and_end_on(
-                line.get_end(), line.get_end()
-            )
-            line_animations.append(animation)
-
-        # reanimate the centroids just to keep them on top
-        centroid_animations = []
-        for i, centroid in enumerate(self.centroids):
-            centroid_animations.append(centroid.animate.set_color(self.C_COLORS[i]))
-
-        self.play(
-            LaggedStart(
-                AnimationGroup(*line_animations),
-                AnimationGroup(*dot_animations),
-                AnimationGroup(*centroid_animations),
-            ),
-            run_time=0.75
-        )
-
-        # Fade out the lines
-        self.play(*[FadeOut(line) for line in self.final_lines], run_time=0.75)
-
-        return
-
-    def construct_animate_centroid_distance_lines(self):
-        """Animate the line projections/retractions of the shortest lines to dots."""
-        # Get the labels for the dots
-        # temp_lines = []
-        self.final_lines = []
-
-        labels = self.get_labels()
-
-        # Animate the construction of all of the lines
-        line_animations = []
-        for i, dot in enumerate(self.dots):
-            dot_line_animations = []
-            for j, centroid in enumerate(self.centroids):
-                if j != labels[i]:
-                    continue
-                line = Line(
-                    centroid.get_center(),
-                    dot.get_center(),
-                    stroke_width=1,
-                    color=self.D_COLORS[j],
-                )
-
-                # if j != labels[i]:
-                #     temp_lines.append(line)
-                # else:
-                self.final_lines.append(line)
-                dot_line_animations.append(Write(line))
-
-            line_animations.append(AnimationGroup(*dot_line_animations))
-
-        self.play(*line_animations, AnimationGroup(*self.create_persistent_animations()), run_time=0.75)
-
-        # Animate the retraction of the shortest lines
-        # self.play(*[Uncreate(line) for line in temp_lines])
-        # self.wait(0.4)
-        return
+    def animate_label_assignment(self, step):
+        labels = self.get_labels(step)
         
+        dot_animations = []
+        centroid_animations = []
+        for i, centroid in enumerate(self.centroids):
+            dot_indices = np.argwhere(labels == i).reshape(-1)
+            dots = [self.dots[dot_index] for dot_index in dot_indices]
+            
+            for dot in dots:
+                dot_animations.append(FadeToColor(dot, color=self.D_COLORS[i]))
+            
+            centroid_indicate = Indicate(centroid, scale_factor=1.75, color=centroid.get_color())
+            centroid_animations.append(centroid_indicate)
+        
+        self.play(*centroid_animations)
+        self.play(*dot_animations)
+        return
+
+    def animate_polygons(self):
+        self.play(
+            LaggedStart(*[Write(polygon) for polygon in self.polygons], lag_ratio=2/8),
+            self.create_persistent_animations(),
+        )     
+        return
+
     def animate_centroid_init(self):
         animations = []
         for centroid, dot in zip(self.centroids, self.original_dots):
@@ -496,48 +504,96 @@ class KMeansFrameSelection_2(KMeansFrameSelection_1):
             )
             animations.append(animation)
 
-        self.play(LaggedStart(*animations, lag_ratio=3/len(self.centroids)))
-        
+        self.play(LaggedStart(*animations, lag_ratio=3 / len(self.centroids)))
+
         return
     
-    def construct_centroids(self):
+    def construct_polygons(self, step=0):
+        self.polygons = []
+        polygons_coords = get_polygons(
+            self.centroid_history[step], [-5.25, 5.25], [-4.25, 4.25]
+        )
+        for i, coords in enumerate(polygons_coords):
+            updated_coords = [self.graph.coords_to_point(*point) for point in coords]
+            polygon = Polygon(
+                *updated_coords, fill_color=self.D_COLORS[i], fill_opacity=0.2
+            )
+            self.polygons.append(polygon)
+        return
+    
+    def construct_centroids(self, step=0):
         self.centroids = []
         self.original_dots = []
-        
+
         for i in range(self.centroid_history.shape[1]):
-            coord = self.centroid_history[0, i] / 1000
+            coord = self.centroid_history[step, i]
             position = self.graph.coords_to_point(*coord)
-            
-            centroid = Dot(position, color=self.C_COLORS[i], radius=0.115)
+
+            centroid = Dot(position, color=self.C_COLORS[i], radius=0.125)
             self.centroids.append(centroid)
 
-            # Identify the first dot for the animation 
-            original_dot_index = np.argwhere(
-                self.bee_pca[:, :] == self.centroid_history[0, i, :2]
-            )[0, 0]
-            original_dot = self.dots[original_dot_index]
-            self.original_dots.append(original_dot)
+            # Identify the first dot for the animation
+            if step == 0:
+                original_dot_index = np.argwhere(
+                    self.bee_pca[:, :] == self.centroid_history[step, i, :2]
+                )[0, 0]
+                original_dot = self.dots[original_dot_index]
+                self.original_dots.append(original_dot)
 
         return
-    
+
+    def animate_algorithm_step(self, step):
+        if step == 0:
+            self.box = None
+        new_box = Rectangle(
+            self.algo_steps[step].get_width() * 1.05,
+            self.algo_steps[step].get_height() * 1.3,
+            color=RED,
+        )
+        new_box.move_to(self.algo_steps[step].get_center())
+
+        if step == 0:
+            self.play(Write(new_box))
+        else:
+            self.play(ReplacementTransform(self.box, new_box))
+        self.box = new_box
+        return
+
+    def construct_algorithm_group(self):
+        self.algo_title_text = TexText("K-means Steps").scale(0.75)
+        algo_title_bottom = self.algo_title_text.get_bottom()[1]
+        line_left = self.algo_title_text.get_left()
+        line_left[1] = algo_title_bottom
+        line_right = self.algo_title_text.get_right()
+        line_right[1] = algo_title_bottom
+        self.algo_title_UL = Line(line_left, line_right)
+        self.algo_title_group = VGroup(self.algo_title_text, self.algo_title_UL)
+
+        self.algo_steps = TexText(
+            "1. Select centroids\\\\",
+            "2. Assign data labels\\\\",
+            "3. Update centroid positions\\\\",
+            "4. Repeat steps 2 \& 3\\\\until convergence",
+        ).scale(0.75)
+
+        self.algo_group = VGroup(self.algo_title_group, self.algo_steps)
+        self.algo_group.arrange(DOWN, buff=0.2)
+        self.algo_group.scale(0.8).to_edge(LEFT).shift(LEFT * 0.2)
+        return
+
     def construct_text(self):
-        self.text = TexText(
-            """
-                Then, cluster the data using k-means. \\\\
-                Here, we use an arbitrary ${k=8}$ to select $8$ unique frames for labeling.
+        self.text = (
+            TexText(
                 """
-        ).scale(0.8).to_edge(DOWN).shift(DOWN*0.2)
+                Use $k=8$ to identify 8 keyframes from the video for labeling.\\\\
+            """
+            )
+            .scale(0.8)
+            .to_edge(DOWN)
+            .shift(DOWN * 0.2)
+        )
         return
 
-    def animate_dot_grayout(self):
-        animations = []
-        for dot in self.dots:
-            # animations.append(dot.animate.set_color(self.DOT_COLOR))
-            animations.append(FadeToColor(dot, self.DOT_COLOR, run_time=0.1))
-        
-        self.play(LaggedStart(*animations, lag_ratio=1.5/len(self.dots)))
-        return
-    
 
 class KMeansAlgo(Scene):
     def initialize_parameters(self):
