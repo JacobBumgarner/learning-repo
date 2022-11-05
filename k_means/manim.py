@@ -672,7 +672,6 @@ class KMeansFrameSelection_4(KMeansFrameSelection_3):
             FadeToColor(self.pose_square_l, GREEN, run_time=(2+(8*(2/8)))),
             FadeToColor(self.pose_square_r, GREEN, run_time=(2+(8*(2/8)))),
         )
-        self.play(WiggleOutThenIn(self.pose_model))
         return
 
     def animate_construct_pose_model(self):
