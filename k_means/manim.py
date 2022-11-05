@@ -15,19 +15,6 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 
-class twox(Scene):
-    def construct(self):
-        text = TexText("3x")
-        speed = Speedometer(num_ticks=0)
-        speed.needle.set_color(RED)
-        speed.scale(text.get_height()/speed.get_height())
-        group = VGroup(speed, text).arrange(RIGHT)
-        group.to_edge(DOWN)
-        self.play(Write(group[:]))
-        self.wait(1)
-        self.play(FadeOut(group))
-        return
-
 class KMeansFrameSelection_0(Scene):
     def initialize_parameters_0(self):
         """Initialize the parameters for the animation."""
@@ -238,7 +225,7 @@ class KMeansFrameSelection_1(KMeansFrameSelection_0):
         self.box = Rectangle(3.65, 1.75)
         self.PCA_text = TexText("PCA \\\\ ${n_{components} = 2}$")
         self.PCA_group = VGroup(self.box, self.PCA_text).scale(0.6)
-        self.PCA_square = Square(0.1, fille_color=WHITE, fill_opacity=1).move_to(
+        self.PCA_square = Square(0.1, fill_color=WHITE, fill_opacity=1).move_to(
             self.box.get_left()
         )
         self.PCA_dot = Dot(self.box.get_right(), color=WHITE, radius=0.05)
@@ -371,12 +358,12 @@ class KMeansFrameSelection_3(KMeansFrameSelection_2):
 
         self.initialize_parameters()
 
-        self.construct_text()
-        self.construct_algorithm_group()
-        self.construct_centroids()
-        self.construct_polygons()
-
         if active_scene:
+            self.construct_text()
+            self.construct_algorithm_group()
+            self.construct_centroids()
+            self.construct_polygons()
+
             self.animate()
         return
 
@@ -393,23 +380,28 @@ class KMeansFrameSelection_3(KMeansFrameSelection_2):
             self.wait(0.25)
             if i == 1:
                 self.animate_polygons()
-            self.animate_label_assignment((i-1)*30)
+            self.animate_label_assignment((i - 1) * 30)
             self.wait(0.25)
 
             # animate centroid position updates
             self.animate_algorithm_step(2)
             self.wait(0.25)
-            self.animate_centroid_position_line_draw(i*30)
+            self.animate_centroid_position_line_draw(i * 30)
             self.wait(0.25)
             for j in range(30):
-                step = j + (i-1) * 30
+                step = j + (i - 1) * 30
                 self.animate_centroid_position_update(step)
             self.animate_centroid_position_line_fade()
 
             self.animate_algorithm_step(3)
 
         self.play(FadeOut(self.algo_group, LEFT), FadeOut(self.box, LEFT))
-        self.play(LaggedStart(*[Uncreate(polygon) for polygon in self.polygons], lag_ratio=2/8), self.create_persistent_animations())
+        self.play(
+            LaggedStart(
+                *[Uncreate(polygon) for polygon in self.polygons], lag_ratio=2 / 8
+            ),
+            self.create_persistent_animations(),
+        )
         self.play(*[FadeOut(centroid, scale=0) for centroid in self.centroids])
         return
 
@@ -420,7 +412,7 @@ class KMeansFrameSelection_3(KMeansFrameSelection_2):
         self.add(*self.polygons, *self.dots, *self.centroids)
         self.wait(1 / 30)
         return
-    
+
     def animate_centroid_position_line_fade(self):
         animations = []
         for line in self.avg_lines:
@@ -433,14 +425,14 @@ class KMeansFrameSelection_3(KMeansFrameSelection_2):
             AnimationGroup(*animations),
             self.create_persistent_animations(),
         )
-        self.remove(*self.avg_lines)        
+        self.remove(*self.avg_lines)
         return
-        
+
     def animate_centroid_position_line_draw(self, step):
         """Animate the update to the centroid positions."""
         ### IMPORTANT ###
         # I interpolated one second of frames at 30 fps between the original
-        # centroid positions. 
+        # centroid positions.
         # This means that i * 30 for i in range(original_hist.shape[0]) matches
         # the location of the original positions
         ### IMPORTANT ###
@@ -471,28 +463,32 @@ class KMeansFrameSelection_3(KMeansFrameSelection_2):
 
     def animate_label_assignment(self, step):
         labels = self.get_labels(step)
-        
+
         dot_animations = []
         centroid_animations = []
         for i, centroid in enumerate(self.centroids):
             dot_indices = np.argwhere(labels == i).reshape(-1)
             dots = [self.dots[dot_index] for dot_index in dot_indices]
-            
+
             for dot in dots:
                 dot_animations.append(FadeToColor(dot, color=self.D_COLORS[i]))
-            
-            centroid_indicate = Indicate(centroid, scale_factor=1.75, color=centroid.get_color())
+
+            centroid_indicate = Indicate(
+                centroid, scale_factor=1.75, color=centroid.get_color()
+            )
             centroid_animations.append(centroid_indicate)
-        
+
         self.play(*centroid_animations)
         self.play(*dot_animations)
         return
 
     def animate_polygons(self):
         self.play(
-            LaggedStart(*[Write(polygon) for polygon in self.polygons], lag_ratio=2/8),
+            LaggedStart(
+                *[Write(polygon) for polygon in self.polygons], lag_ratio=2 / 8
+            ),
             self.create_persistent_animations(),
-        )     
+        )
         return
 
     def animate_centroid_init(self):
@@ -507,7 +503,7 @@ class KMeansFrameSelection_3(KMeansFrameSelection_2):
         self.play(LaggedStart(*animations, lag_ratio=3 / len(self.centroids)))
 
         return
-    
+
     def construct_polygons(self, step=0):
         self.polygons = []
         polygons_coords = get_polygons(
@@ -520,7 +516,7 @@ class KMeansFrameSelection_3(KMeansFrameSelection_2):
             )
             self.polygons.append(polygon)
         return
-    
+
     def construct_centroids(self, step=0):
         self.centroids = []
         self.original_dots = []
@@ -592,6 +588,289 @@ class KMeansFrameSelection_3(KMeansFrameSelection_2):
             .to_edge(DOWN)
             .shift(DOWN * 0.2)
         )
+        return
+
+
+class KMeansFrameSelection_4(KMeansFrameSelection_3):
+    def initialize_parameters_4(self):
+        self.selected_dot_indices = np.load("label_videos/label_frame_indices.npy")
+        return
+
+    def load_previous_scene_4(self):
+        labels = self.get_labels(180)
+        for i, dot in enumerate(self.dots):
+            dot.set_color(self.D_COLORS[labels[i]])
+
+        self.add(self.title_group)
+        self.add(self.graph)
+        self.add(*self.dots)
+        return
+
+    def load_frames(self, path):
+        images = []
+        for frame in self.selected_dot_indices:
+            image_name = "%04d" % frame + ".png"
+            filename = path + image_name
+            image = ImageMobject(filename).scale(0.45)
+            images.append(image)
+        return images
+
+    def construct(self, active_scene=True):
+        super().construct(active_scene=False)
+        self.initialize_parameters_4()
+
+        if active_scene:
+            self.load_previous_scene_4()
+            self.construct_text()
+            self.animate()
+        return
+
+    def animate(self):
+        # select frames
+        self.play(Write(self.text_1[:]))
+        self.animate_shift_graph_left()
+        self.animate_frame_selection()
+
+        # 'label' frames
+        self.play(FadeOut(self.text_1))
+        self.play(*self.animate_graph_fade(), *self.animate_image_group_centering())
+        self.play(Write(self.text_2[:]))
+        self.animate_frame_labeling()
+        self.play(FadeOut(self.text_2))
+
+        # 'train' cnn
+        self.play(Write(self.text_3[:]))
+        self.animate_frame_left_stack()
+        self.animate_construct_pose_model()
+        self.animate_frame_training()
+        self.play(FadeOut(self.text_3))
+
+        # 'label' video
+        self.play(Write(self.text_4[:]))
+        self.wait(1)
+        self.play(FadeOut(self.pose_model))
+
+        self.wait(1)
+        self.play(FadeOut(self.text_4))
+        self.wait(1)
+        self.play(FadeOut(self.title_group))
+
+        return
+    
+    def animate_frame_training(self):
+        # animate the movement of the frames into the pca box
+        position = self.pose_square_l.get_center()
+        
+        animations = []
+        for i in range(len(self.labeled_images)-1, -1, -1):
+            animation = self.labeled_images[i].animate.move_to(position).scale(0)
+            animations.append(animation)
+        
+        self.play(
+            LaggedStart(*animations, lag_ratio=2/len(self.original_images)),
+            FadeToColor(self.pose_box, GREEN, run_time=(2+(8*(2/8)))),
+            FadeToColor(self.pose_square_l, GREEN, run_time=(2+(8*(2/8)))),
+            FadeToColor(self.pose_square_r, GREEN, run_time=(2+(8*(2/8)))),
+        )
+        self.play(WiggleOutThenIn(self.pose_model))
+        return
+
+    def animate_construct_pose_model(self):
+        self.pose_text = TexText("Pose \\\\ Estimation \\\\ Model").scale(0.7)
+        self.pose_box = Rectangle(
+            self.pose_text.get_width() * 1.2, self.pose_text.get_height() * 1.2
+        )
+        self.pose_square_l = Square(0.1, fill_color=WHITE, fill_opacity=1).move_to(
+            self.pose_box.get_left()
+        )
+        self.pose_square_r = Square(0.1, fill_color=WHITE, fill_opacity=1).move_to(
+            self.pose_box.get_right()
+        )
+        self.pose_model = VGroup(
+            self.pose_text, self.pose_box, self.pose_square_l, self.pose_square_r
+        )
+        self.play(Write(self.pose_model[:]))
+
+        return
+
+    def animate_frame_left_stack(self):
+        # make the image grid
+        scaling = 0.8
+        width = self.labeled_images[0].get_width() * 1.1 * scaling / 2
+        height = self.labeled_images[0].get_height() * scaling / 1.2
+        x = [-width, width]
+        y = np.linspace(-height * 2, height * 2, 4)
+        image_coords = np.array(np.meshgrid(x, y)).T.reshape(-1, 2)
+        image_coords = np.pad(image_coords, ((0, 0), (0, 1)))
+        image_coords += ORIGIN + DOWN * 0.1 + LEFT * 4
+
+        # animate the image movement & scaling
+        animations = []
+        for i in [2, 1, 0, 5, 4, 3, 6, 7]:
+            animation = (
+                self.labeled_images[i].animate.scale(scaling).move_to(image_coords[i])
+            )
+            animations.append(animation)
+
+        self.play(LaggedStart(*animations))
+
+        return
+
+    def animate_frame_labeling(self):
+        # load and position the labeled frames
+        path = "/Users/jacobbumgarner/Desktop/learning-repo/local_files/k_means/labeled_bee_images/"
+        self.labeled_images = self.load_frames(path)
+
+        image_grid = self.load_image_grid(self.labeled_images)
+        for i, image in enumerate(self.labeled_images):
+            image.move_to(image_grid[i])
+
+        # animate the 'labeling' of the first frame
+        middle_image = 4
+        self.add(self.original_images[middle_image])
+        self.play(self.original_images[middle_image].animate.scale(3))
+        self.labeled_images[middle_image].scale(3)
+        self.play(FadeIn(self.labeled_images[middle_image]))
+        self.wait(1)
+        self.remove(self.original_images[middle_image])
+        self.play(self.labeled_images[middle_image].animate.scale(1 / 3))
+
+        # animate the 'labeling' of the rest of the frames. try a fadein first
+        # pull all of the labeled images except for the 3rd
+        images = [self.labeled_images[i] for i in [2, 1, 0, 5, 3, 6, 7]]
+        self.play(*[FadeIn(image, run_time=0.1) for image in images])
+        self.play(*[WiggleOutThenIn(image) for image in images])
+        self.remove(*self.original_images)
+        return
+
+    def animate_image_group_centering(self):
+        animations = []
+        image_grid = self.load_image_grid(self.original_images)
+        for i, image in enumerate(self.original_images):
+            animations.append(image.animate.move_to(image_grid[i]))
+
+        return animations
+
+    def animate_graph_fade(self):
+        animations = []
+        animations.append(FadeOut(self.graph, LEFT))
+        animations.extend([FadeOut(dot, LEFT) for dot in self.dots])
+        return animations
+
+    def load_image_grid(self, images, right_shift=False):
+        # Construct the grid (3, 3, 2)
+        height = images[0].get_height() * 1.1
+        width = images[0].get_width() * 1.1
+        a = [-width, 0, width]
+        b = [height, 0]
+        top_two_rows = np.array(np.meshgrid(a, b)).T.reshape(-1, 2)
+        sorted_indices = np.argsort(top_two_rows[:, 1])
+        top_two_rows = np.flip(top_two_rows[sorted_indices], axis=0)
+        bottom_rows = [[-width / 2, -height], [width / 2, -height]]
+        image_coords = np.concatenate(
+            (top_two_rows, bottom_rows),
+        )
+        image_coords = np.pad(image_coords, ((0, 0), (0, 1)))
+        image_coords += ORIGIN + UP * 0.1
+
+        if right_shift:
+            image_coords += RIGHT * 3.5
+
+        return image_coords
+
+    def animate_frame_selection(self):
+        # First load the images and create their final image grid
+        path = "/Users/jacobbumgarner/Desktop/learning-repo/local_files/k_means/bee_images/"
+        self.original_images = self.load_frames(path)
+
+        image_grid = self.load_image_grid(self.original_images, right_shift=True)
+
+        # then find the position of the dots associated with each image, set each
+        # position as the starting point for each image, make sure to scale the image
+        selected_dots = []
+        for i, index in enumerate(self.selected_dot_indices):
+            selected_dots.append(self.dots[index])
+            dot_position = self.dots[index].get_center()
+            self.original_images[i].move_to(dot_position).scale(0.45 / 100)
+
+        # lastly, animate the 'selection' of the frames
+        animations = []
+        for i in range(len(self.original_images)):
+            dot_animation = Indicate(selected_dots[i], color=YELLOW, scale_factor=8)
+            frame_animation = (
+                self.original_images[i].animate.move_to(image_grid[i]).scale(100 / 0.45)
+            )
+            animation = LaggedStart(dot_animation, frame_animation, lag_ratio=0.6)
+            animations.append(animation)
+
+        self.play(LaggedStart(*animations, lag_ratio=2 / len(self.original_images)))
+        return
+
+    def animate_shift_graph_left(self):
+        self.play(
+            self.graph.animate.shift(LEFT * 3.5),
+            *[dot.animate.shift(LEFT * 3.5) for dot in self.dots],
+        )
+        # self.add(self.graph, *self.dots)
+        return
+
+    def construct_text(self):
+        self.text_1 = (
+            TexText(
+                """
+            Lastly, select one data point from each group and select \\\\
+            its associated frame in the video.
+            """
+            )
+            .scale(0.8)
+            .to_edge(DOWN)
+            .shift(DOWN * 0.2)
+        )
+        self.text_2 = (
+            TexText(
+                """
+            These keyframes can then be manually labeled for specific body parts.
+            Here, the antennae, head, abdomen, thorax, and legs have been labeled.
+            """
+            )
+            .scale(0.8)
+            .to_edge(DOWN)
+            .shift(DOWN * 0.2)
+        )
+        self.text_3 = (
+            TexText(
+                """
+            The labeled keyframes are used to train pose estimation CNN models.
+            """
+            )
+            .scale(0.8)
+            .to_edge(DOWN)
+            .shift(DOWN * 0.2)
+        )
+        self.text_4 = (
+            TexText(
+            """
+            The trained models can be used to generate labels for entire videos.
+            """
+            )
+            .scale(0.8)
+            .to_edge(DOWN)
+            .shift(DOWN * 0.2)
+        )
+        return
+
+
+class twox(Scene):
+    def construct(self):
+        text = TexText("3x")
+        speed = Speedometer(num_ticks=0)
+        speed.needle.set_color(RED)
+        speed.scale(text.get_height() / speed.get_height())
+        group = VGroup(speed, text).arrange(RIGHT)
+        group.to_edge(DOWN)
+        self.play(Write(group[:]))
+        self.wait(1)
+        self.play(FadeOut(group))
         return
 
 
