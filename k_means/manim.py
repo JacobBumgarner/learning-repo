@@ -26,6 +26,7 @@ class KMeansFrameSelection_0(Scene):
     def construct(self, active_scene=True):
         self.initialize_parameters_0()
         self.construct_title()
+        self.construct_video_credit()
         self.construct_text()
 
         if active_scene:
@@ -35,11 +36,13 @@ class KMeansFrameSelection_0(Scene):
     def animate(self):
         self.play(Write(self.title_group))
         self.wait(1)
+        self.play(Write(self.video_credit[:]))
+        self.wait(0.5)
         self.play(Write(self.text_1[:]))
-        self.wait(1)
-        self.play(FadeOut(self.text_1))
+        self.wait(2)
+        self.play(FadeOut(self.text_1), FadeOut(self.video_credit))
         self.play(Write(self.text_2[:]))
-        self.wait(1)
+        self.wait(2)
         self.play(FadeOut(self.text_2))
         return
 
@@ -67,6 +70,17 @@ class KMeansFrameSelection_0(Scene):
             .to_edge(DOWN)
             .shift(DOWN * 0.2)
         )
+        return
+
+    def construct_video_credit(self):
+        self.video_credit = TexText(
+            """
+            Video Source:\\\\
+            Pereira et al., 2022\\\\
+            sleap.ai/datasets.html
+            """
+        ).scale(0.6).shift(RIGHT*5.3)
+        
         return
 
     def construct_title(self):
@@ -817,7 +831,7 @@ class KMeansFrameSelection_4(KMeansFrameSelection_3):
         self.text_1 = (
             TexText(
                 """
-            Lastly, select one data point from each group and select \\\\
+            Lastly, choose one data point from each group and select \\\\
             its associated frame in the video.
             """
             )
