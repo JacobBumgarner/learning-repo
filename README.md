@@ -7,6 +7,7 @@ The easiest way that for me to learn or improve my understanding of topics is by
 
 | Field | Method | Date |
 | ----- | ------ | ---- | 
+| ML | [K-Means](https://medium.com/p/e0ef0168688d) | 11/06/2022 |
 | ML | [Logistic Regression](https://medium.com/@jacobbumgarner/breaking-it-down-logistic-regression-e5c3f1450bd) | 08/21/2022 |
 | ML/DL | [Gradient Descent](https://medium.com/@jacobbumgarner/breaking-it-down-gradient-descent-b94c124f1dfd) | 07/25/2022 |
 | ML/DL | [Softmax](softmax/softmax.ipynb) | 06/23/2022 |
