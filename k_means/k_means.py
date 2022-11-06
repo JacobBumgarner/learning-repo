@@ -7,6 +7,7 @@ import numpy as np
 
 from scipy.spatial.distance import cdist
 
+
 class KMeans:
     def __init__(
         self,
@@ -17,20 +18,22 @@ class KMeans:
     ):
         """Construct a k-means clustering object.
 
-        Can be fit to input data, return data labels, and return centroid positions.
+        Can be fit to input data, return data labels, and return centroid
+        positions.
 
         Parameters
         ----------
         n_clusters : int, optional
             The number of clusters to compute. Default is 3.
         centroid_init : str, optional
-            The method used to initialized the centroids. Must be either "kmeans++" or
-            "random". Default is "kmeans++".
+            The method used to initialized the centroids. Must be either
+            "kmeans++" or "random". Default is "kmeans++".
         max_iterations : int, optional
-            The maximum  number of iterations that the algorithm will run prior to
-            ending the convergence. Default is 1000.
+            The maximum  number of iterations that the algorithm will run
+            prior to ending the convergence. Default is 1000.
         verbose : bool, optional
-            Whether to print the status of the algorithm. Defalut is False.
+            Whether to print the status of the algorithm.
+            Default is False.
 
         Attributes
         ----------
@@ -138,8 +141,8 @@ class KMeans:
         input_data : np.ndarray
             The input data.
         n_centroids : int
-            The number of centroid points to initialize from randomly selected
-            points in the input dataset.
+            The number of centroid points to initialize from randomly
+            selected points in the input dataset.
 
         Returns
         -------
@@ -162,8 +165,8 @@ class KMeans:
             distances = distances.min(axis=1)
 
             # select a new centroid randomly based on the prob. distribution
-            # previous centroids will have probabilities of 0 - highly unlikely
-            # to get a reselection.
+            # previous centroids will have probabilities of 0 -
+            # highly unlikely to get a reselection.
             prob_distribution = distances / distances.sum()
             centroid_index = np.random.choice(input_data.shape[0], p=prob_distribution)
 
@@ -175,7 +178,7 @@ class KMeans:
     def _compute_labels(
         self, input_data: np.ndarray, centroids: np.ndarray
     ) -> np.ndarray:
-        """Return the index of the closet cluster for each input data point.
+        """Return the resulting cluster data labels.
 
         Parameters
         ----------
@@ -219,8 +222,11 @@ class KMeans:
         distances = cdist(centroids, input_data, "sqeuclidean")
         return distances
 
-    def _update_centroid_locations(
-        self, centroids: np.ndarray, input_data: np.ndarray, labels: np.ndarray
+    def _update_centroid_positions(
+        self,
+        centroids: np.ndarray,
+        input_data: np.ndarray,
+        labels: np.ndarray,
     ) -> np.ndarray:
         """Update the location of each centroid to its center of mass.
 
@@ -231,7 +237,8 @@ class KMeans:
         input_data : np.ndarray
             The input data to the algorithm.
         labels : np.ndarray
-            The labels showing the closet centroid to each piece of input data.
+            The labels showing the closet centroid to each piece of
+            input data.
 
         Returns
         -------
