@@ -2557,3 +2557,17 @@ class KMeansIntro(Scene):
         self.card_one_group.arrange(DOWN, buff=0.5)
 
         return
+
+class Title(Scene):
+    def construct(self):
+        self.title = TexText("K-Means Clustering Algorithm").scale(0.8).to_edge(UP).shift(UP*0.2)
+        
+        line_left = LEFT_SIDE + [0.5, 0, 0]
+        line_left[1] = self.title.get_bottom()[1] * 0.95
+        line_right = RIGHT_SIDE - [0.5, 0, 0]
+        line_right[1] = self.title.get_bottom()[1] * 0.95
+        self.title_underline = Line(line_left, line_right, color=WHITE, stroke_width=2)
+        self.title_group = VGroup(self.title, self.title_underline)
+        
+        self.play(Write(self.title_group[:]))
+        return
