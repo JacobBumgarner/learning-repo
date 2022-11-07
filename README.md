@@ -1,5 +1,5 @@
 # Learning Repo
-This is my public drafting space where I learn about or reinforce my understanding of various statistical methods, machine learning algorithms, deep learning models, or image processing techniques.
+This is my public drafting space where I learn about or reinforce my understanding of various statistical methods, machine learning algorithms, deep learning models, or image processing techniques. The resulting educational materials are then published on Medium in my 'Breaking it Down' series.
 
 The easiest way that for me to learn or improve my understanding of topics is by breaking them down to the basics and then teaching the concepts to others, à la [Richard Feynman](https://www.colorado.edu/artssciences-advising/resource-library/life-skills/the-feynman-technique-in-academic-coaching). After breaking down these topics, I work to write and publish articles on the information that I've learnred.
 
@@ -19,3 +19,5 @@ The goal for these articles that I create is to convert them into Medium posts. 
 ## Issues and Feedback
 
 Please feel free to open an issue if you find anything wrong with the examples or have any suggestions for improvement.
+
+Copyright © 2022 Jacob Bumgarner
