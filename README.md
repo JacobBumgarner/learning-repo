@@ -1,7 +1,15 @@
 # Learning Repo
-This is my public drafting space where I learn about or reinforce my understanding of various statistical methods, machine learning algorithms, deep learning models, or image processing techniques. The resulting educational materials are then published on Medium in my 'Breaking it Down' series.
+The easiest way for me to learn is by breaking topics down to their fundamental components and then teaching the concepts to others, à la [Richard Feynman](https://www.colorado.edu/artssciences-advising/resource-library/life-skills/the-feynman-technique-in-academic-coaching).
 
-The easiest way that for me to learn or improve my understanding of topics is by breaking them down to the basics and then teaching the concepts to others, à la [Richard Feynman](https://www.colorado.edu/artssciences-advising/resource-library/life-skills/the-feynman-technique-in-academic-coaching). After breaking down these topics, I work to write and publish articles on the information that I've learnred.
+This is my public drafting space where I exercise that technique to learn about or reinforce my understanding of interesting computational topics. These topics include machine learning algorithms, deep learning models, image processing techniques, and statistical methods, among others.
+
+The resulting educational materials that I generate for each topic are published on Medium in my 'Breaking it Down' series, typically hosted by the _Towards Data Science_ publication. These educational materials lean heavily on [**manim**](https://github.com/3b1b/manim) for visualizations.
+
+**Example trailer for the [K-Means post](https://towardsdatascience.com/breaking-it-down-k-means-clustering-e0ef0168688d)**
+
+https://user-images.githubusercontent.com/70919881/200381717-31b26e72-0793-4de3-994f-2d538b0104d6.mov
+
+
 
 ## Learning History
 
