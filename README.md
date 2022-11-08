@@ -1,7 +1,7 @@
 # Learning Repo
 The easiest way for me to learn is by breaking topics down to their fundamental components and then teaching the concepts to others, à la [Richard Feynman](https://www.colorado.edu/artssciences-advising/resource-library/life-skills/the-feynman-technique-in-academic-coaching).
 
-This is my public drafting space where I exercise that technique to learn about or reinforce my understanding of interesting computational topics. These topics include machine learning algorithms, deep learning models, image processing techniques, and statistical methods, among others.
+This is my public drafting space where I exercise that approach to about or reinfor interesting computational topics. These topics include machine learning algorithms, deep learning models, image processing techniques, and statistical methods, among others.
 
 The resulting educational materials that I generate for each topic are published on Medium in my 'Breaking it Down' series, typically hosted by the _Towards Data Science_ publication. These educational materials lean heavily on [**manim**](https://github.com/3b1b/manim) for visualizations.
 
