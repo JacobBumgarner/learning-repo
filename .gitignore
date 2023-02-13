@@ -20,8 +20,5 @@ htmlcov/
 *.code-workspace
 .vscode/
 
-# Cpp
-.dYSM
-
 # Learning-Repo Specific
 local_files/
