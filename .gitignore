@@ -21,7 +21,7 @@ htmlcov/
 .vscode/
 
 # Cpp
-.dSYM/
+.dSYM
 
 # Learning-Repo Specific
 local_files/
