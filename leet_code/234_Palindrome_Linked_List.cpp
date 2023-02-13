@@ -10,40 +10,45 @@ struct ListNode
     ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
-int main(ListNode *head)
+// Runtime 243 ms Beats 74.35% Memory 114.1 MB Beats 85.29%
+class Solution
 {
-    ListNode *fast = head, *slow = head, *prev, *tmp;
-
-    // reverse the right half of the list
-    while (fast && fast->next)
+public:
+    bool isPalindrome(ListNode *head)
     {
-        slow = slow->next;
-        fast = fast->next->next;
-    }
+        ListNode *fast = head, *slow = head, *prev, *tmp;
 
-    prev = NULL;
-    while (slow)
-    {
-        tmp = prev;
-        prev = slow;
-        slow = slow->next;
-        prev->next = tmp;
-    }
-
-    // check if palindrome
-    slow = prev;
-    fast = head;
-    while (slow)
-    {
-        if (slow->val != fast->val)
+        // reverse the right half of the list
+        while (fast && fast->next)
         {
-            return false;
+            slow = slow->next;
+            fast = fast->next->next;
         }
-        slow = slow->next;
-        fast = fast->next;
+
+        prev = NULL;
+        while (slow)
+        {
+            tmp = prev;
+            prev = slow;
+            slow = slow->next;
+            prev->next = tmp;
+        }
+
+        // check if palindrome
+        slow = prev;
+        fast = head;
+        while (slow)
+        {
+            if (slow->val != fast->val)
+            {
+                return false;
+            }
+            slow = slow->next;
+            fast = fast->next;
+        }
+        return true;
     }
-    return true;
-}
+};
 
 bool too_slow(ListNode *head)
 {
@@ -75,4 +80,10 @@ bool too_slow(ListNode *head)
     }
 
     return true;
+}
+
+
+int main()
+{
+    return 0;
 }
