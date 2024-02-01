@@ -1,14 +1,18 @@
-# Study Overview
+# Review Document for Data Structures and Algorithms
+# To-Do
+[ ] add ipynb for current solutions
+[ ] update ipynb links for current current solutions
 
+### Resources
 Links:
 - Rosa Session: https://chat.openai.com/g/g-6VqZewHmW-rosagpt/c/525051e5-9c63-4d34-8fc1-9a87015fa474
 - Anki: https://ankiweb.net/decks
 - LeetCode: https://leetcode.com/
+- concept map: https://roadmap.sh/computer-science
+- neetcode: https://neetcode.io/courses/dsa-for-beginners/1
 
-Resources:
-
-- https://roadmap.sh/computer-science
-- https://neetcode.io/courses/dsa-for-beginners/1
+# Introduction
+This is a master document that I'm creating while reviewing the fundamentals for algorithm and coding problem solving. The document closely follows the review heirarchy structure of [neetcode](https://neetcode.io), created by Navdeep Singh. The document contains overview sections of data structures and algorithms as well as associated LeetCode problems that can be used to reinforce the topic concepts.
 
 # Data Structures
 ## Basic
@@ -18,14 +22,48 @@ Arrays are data structures used to store an ordered collection of items in *cont
 Because of the fixed data type and sizing constraints, arrays are highly effecient and performant data structures.
 
 #### Problems
-- Remove Duplicates from Sorted Array ([Problem link](https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/); [Solution link](data_structures/00_lc26_duplicates.ipynb))
+- 26. Remove Duplicates from Sorted Array ([Problem link](https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/); [Solution link](data_structures/arrays/00_lc26_duplicates.ipynb))
+- 27. Remove Element ([Problem Link](); [Solution Link](data_structures/arrays/01_lc27_remove_element.ipynb))
+- 1929. Concatenation of Array ([Problem Link](); [Solution Link](data_structures/arrays/02_lc1929_concatenation.ipynb))
 
+### Stacks
+Stacks are an abstract data type that act as collections of objects. They can
+be constructed with arrays or linked lists.
+
+Stacks follow the *LIFO* principle (Last In, First Out) and have two main
+operations:
+- Push: Add an element to top of the stack
+- Pop: Remove the top element from the stack
+
+The tops of stacks can also be read without popping.
+
+Stacks are useful for function call management, undo functions, and depth-first
+search (DFS) graph algorithms.
+
+#### Problems
+- 682. Baseball Game ([Problem Link](https://leetcode.com/problems/baseball-game/); [Solution Link]())
+- 20. Valid Parentheses ([Problem Link](https://leetcode.com/problems/valid-parentheses); [Solution Link]())
+- 155. Min Stack ([Problem Link](https://leetcode.com/problems/min-stack/); [Solution Link]())
 
 ### Linked Lists
-Singly and doubly linked lists, circular linked lists.
+Linked lists are data structures with non-contiguous and sequential data storage. Because are not stored contiguously, they are memory efficient and can be dynamically resized. They are useful for contexts that require frequent
+insertions/deletions and are sufficient for sequential access operations. Linked
+lists are the fundamental data structure for stacks, queues, and some hash
+tables.
 
-### Stacks and Queues
-Implementation and use-cases, differences between them
+Linked lists are composed of nodes, which are elements that contain two separate parts of information:
+- **Value** - The value stored in the node
+- **Pointer** - The point in that points to other nodes in the list.
+
+Linked lists can have multiple structures:
+- **Singly Linked** - Each node only points to one other node. The end node 
+points to nothing.
+- **Doubly Linked** - Each node points to the node before and after it in the
+stack.
+- **Circular** - The linked list forms a closed loop.
+
+#### Problems
+- 206. Reverse Linked List ([Problem Link](https://leetcode.com/problems/reverse-linked-list/); [Solution Link]())
 
 ### Hash Tables
 Understanding hashing, collision resolution techniques, implementation of maps and sets
