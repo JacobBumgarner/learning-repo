@@ -22,9 +22,9 @@ Arrays are data structures used to store an ordered collection of items in *cont
 Because of the fixed data type and sizing constraints, arrays are highly effecient and performant data structures.
 
 #### Problems
-- 26. Remove Duplicates from Sorted Array ([Problem link](https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/); [Solution link](data_structures/arrays/00_lc26_duplicates.ipynb))
-- 27. Remove Element ([Problem Link](); [Solution Link](data_structures/arrays/01_lc27_remove_element.ipynb))
-- 1929. Concatenation of Array ([Problem Link](); [Solution Link](data_structures/arrays/02_lc1929_concatenation.ipynb))
+26. Remove Duplicates from Sorted Array ([Problem link](https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/); [Solution link](data_structures/arrays/00_lc26_duplicates.ipynb))
+27. Remove Element ([Problem Link](https://leetcode.com/problems/remove-element/); [Solution Link](data_structures/arrays/01_lc27_remove_element.ipynb))
+1929. Concatenation of Array ([Problem Link](https://leetcode.com/problems/concatenation-of-array/); [Solution Link](data_structures/arrays/02_lc1929_concatenation.ipynb))
 
 ### Stacks
 Stacks are an abstract data type that act as collections of objects. They can
@@ -41,9 +41,9 @@ Stacks are useful for function call management, undo functions, and depth-first
 search (DFS) graph algorithms.
 
 #### Problems
-- 682. Baseball Game ([Problem Link](https://leetcode.com/problems/baseball-game/); [Solution Link]())
-- 20. Valid Parentheses ([Problem Link](https://leetcode.com/problems/valid-parentheses); [Solution Link]())
-- 155. Min Stack ([Problem Link](https://leetcode.com/problems/min-stack/); [Solution Link]())
+682. Baseball Game ([Problem Link](https://leetcode.com/problems/baseball-game/); [Solution Link](data_structures/01_stacks/03_lc682_baseball_game.ipynb))
+20. Valid Parentheses ([Problem Link](https://leetcode.com/problems/valid-parentheses); [Solution Link](data_structures/01_stacks/04_lc20_valid_parentheses.ipynb))
+155. Min Stack ([Problem Link](https://leetcode.com/problems/min-stack/); [Solution Link](data_structures/01_stacks/05_lc155_min_stack.ipynb))
 
 ### Linked Lists
 Linked lists are data structures with non-contiguous and sequential data storage. Because are not stored contiguously, they are memory efficient and can be dynamically resized. They are useful for contexts that require frequent
@@ -63,7 +63,9 @@ stack.
 - **Circular** - The linked list forms a closed loop.
 
 #### Problems
-- 206. Reverse Linked List ([Problem Link](https://leetcode.com/problems/reverse-linked-list/); [Solution Link]())
+206. Reverse Linked List ([Problem Link](https://leetcode.com/problems/reverse-linked-list/); [Solution Link](data_structures/02_linked_lists/06_lc206_reverse_linked_list.ipynb))
+21. Merge Two Sorted Lists ([Problem Link](https://leetcode.com/problems/merge-two-sorted-lists/); [Solution Link](data_structures/02_linked_lists/07_lc21_merged_sorted_lists.ipynb))
+707. Design Browser History ([Problem Link](https://leetcode.com/problems/design-browser-history/description/); [Solution Link](data_structures/02_linked_lists/08_lc1472_design_browser_history.ipynb))
 
 ### Hash Tables
 Understanding hashing, collision resolution techniques, implementation of maps and sets
