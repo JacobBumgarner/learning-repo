@@ -68,7 +68,17 @@ stack.
 707. Design Browser History ([Problem Link](https://leetcode.com/problems/design-browser-history/description/); [Solution Link](data_structures/02_linked_lists/08_lc1472_design_browser_history.ipynb))
 
 ### Hash Tables
-Understanding hashing, collision resolution techniques, implementation of maps and sets
+Hash tables are dictionary-based data structures that map keys to values. The keys for the dictionaries are inputs that have been processed by a `hash` function, whichc converts the input value into an *index* (also known as a *hash code*). 
+
+Hashing ideally creates a unique key for each input value, but most tables have imperfect hash functions, which can lead to multiple input values creating the same key. These duplicate indices for muliplte values are known as *hash collisions*. Collisions can be handled either by "Chaining" or "Open Addressing", both of which are beyond the scope of this document.
+
+Hashes are highly efficient structures, often allowing O(1) time-case complexity for lookup, insertion, and deletion operations.
+
+Hashes are used for database indexing, caching, lookup tables, or associative arrays (dicts).
+
+#### Problems
+217. Contains Duplicate ([Problem Link](https://leetcode.com/problems/contains-duplicate/description/); [Solution Link](data_structures/03_hash_tables/09_lc217_contains_duplicates.ipynb))
+1. Two Sum ([Problem Link](https://leetcode.com/problems/two-sum/description/); [Solution Link](data_structures/03_hash_tables/10_lc1_two_sum.ipynb))
 
 ## Advanced
 ### Trees
