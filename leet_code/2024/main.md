@@ -79,6 +79,7 @@ Hashes are used for database indexing, caching, lookup tables, or associative ar
 #### Problems
 217. Contains Duplicate ([Problem Link](https://leetcode.com/problems/contains-duplicate/description/); [Solution Link](data_structures/03_hash_tables/09_lc217_contains_duplicates.ipynb))
 1. Two Sum ([Problem Link](https://leetcode.com/problems/two-sum/description/); [Solution Link](data_structures/03_hash_tables/10_lc1_two_sum.ipynb))
+146. LRU Cache ([Problem Link](https://leetcode.com/problems/lru-cache/); [Solution Link](data_structures/03_hash_tables/11_lc146_lru_cache.ipynb))
 
 ## Advanced
 ### Trees
