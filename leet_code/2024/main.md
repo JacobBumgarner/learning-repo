@@ -1,7 +1,4 @@
 # Review Document for Data Structures and Algorithms
-# To-Do
-[ ] add ipynb for current solutions
-[ ] update ipynb links for current current solutions
 
 ### Resources
 Links:
@@ -10,6 +7,7 @@ Links:
 - LeetCode: https://leetcode.com/
 - concept map: https://roadmap.sh/computer-science
 - neetcode: https://neetcode.io/courses/dsa-for-beginners/18
+- Solomkin's Tree Viewer: https://solomk.in/leetcode-tree-visualizer
 
 # Introduction
 This is a master document that I'm creating while reviewing the fundamentals for algorithm and coding problem solving. The document closely follows the review heirarchy structure of [neetcode](https://neetcode.io), created by Navdeep Singh. The document contains overview sections of data structures and algorithms as well as associated LeetCode problems that can be used to reinforce the topic concepts.
@@ -20,9 +18,9 @@ Arrays are data structures used to store an ordered collection of items in *cont
 Because of the fixed data type and sizing constraints, arrays are highly effecient and performant data structures.
 
 ### Problems
-26. Remove Duplicates from Sorted Array ([Problem link](https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/); [Solution link](data_structures/arrays/00_lc26_duplicates.ipynb))
-27. Remove Element ([Problem Link](https://leetcode.com/problems/remove-element/); [Solution Link](data_structures/arrays/01_lc27_remove_element.ipynb))
-1929. Concatenation of Array ([Problem Link](https://leetcode.com/problems/concatenation-of-array/); [Solution Link](data_structures/arrays/02_lc1929_concatenation.ipynb))
+26. Remove Duplicates from Sorted Array ([Problem link](https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/); [Solution link](data_structures/00_arrays/00_lc26_duplicates.ipynb))
+27. Remove Element ([Problem Link](https://leetcode.com/problems/remove-element/); [Solution Link](data_structures/00_arrays/01_lc27_remove_element.ipynb))
+1929. Concatenation of Array ([Problem Link](https://leetcode.com/problems/concatenation-of-array/); [Solution Link](data_structures/00_arrays/02_lc1929_concatenation.ipynb))
 
 ## Stacks
 Stacks are an abstract data type that act as collections of objects. They can
@@ -105,6 +103,7 @@ Examples of binary trees include:
 701. Insert into a Binary Search Tree ([Problem Link](https://leetcode.com/problems/insert-into-a-binary-search-tree/); [Solution Link](data_structures/04_trees/13_lc701_insert_into_bst.ipynb))
 450. Delete Node in a BST ([Problem Link](https://leetcode.com/problems/delete-node-in-a-bst/); [Solution Link](data_structures/04_trees/14_lc450_delete_from_bst.ipynb))
 94. Binary Tree Inorder Traversal ([Problem Link](https://leetcode.com/problems/binary-tree-inorder-traversal/description/); [Solution Link](data_structures/04_trees/15_bst_in_order_traversal.ipynb))
+230. Kth Smallest Element in a BST ([Problem Link](https://leetcode.com/problems/kth-smallest-element-in-a-bst/description/); [Solution Link](data_structures/04_trees/16_lc230_kth_smallest_in_bst.ipynb))
 
 
 Binary trees, binary search trees, AVL trees, Red-Black trees, segment trees, Fenwick trees (Binary Indexed Trees), trie (prefix tree).
