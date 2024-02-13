@@ -104,6 +104,7 @@ Examples of binary trees include:
 450. Delete Node in a BST ([Problem Link](https://leetcode.com/problems/delete-node-in-a-bst/); [Solution Link](data_structures/04_trees/14_lc450_delete_from_bst.ipynb))
 94. Binary Tree Inorder Traversal ([Problem Link](https://leetcode.com/problems/binary-tree-inorder-traversal/description/); [Solution Link](data_structures/04_trees/15_bst_in_order_traversal.ipynb))
 230. Kth Smallest Element in a BST ([Problem Link](https://leetcode.com/problems/kth-smallest-element-in-a-bst/description/); [Solution Link](data_structures/04_trees/16_lc230_kth_smallest_in_bst.ipynb))
+105. Construct Binary Tree from Preorder and Inorder Traversal ([Problem Link](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/); [Solution Link](data_structures/04_trees/17_lc105_bt_from_preorder_inorder_lists.ipynb))
 
 
 Binary trees, binary search trees, AVL trees, Red-Black trees, segment trees, Fenwick trees (Binary Indexed Trees), trie (prefix tree).
