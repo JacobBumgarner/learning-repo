@@ -78,9 +78,7 @@ Hashes are used for database indexing, caching, lookup tables, or associative ar
 146. LRU Cache ([Problem Link](https://leetcode.com/problems/lru-cache/); [Solution Link](data_structures/03_hash_tables/11_lc146_lru_cache.ipynb))
 
 
-
-## Trees
-### Binary Trees
+## Binary Trees
 Binary trees are a heirarchical data structure made up of connected nodes. Each binary tree has a single "root" node that sits on "top" of the tree. Each node in a binary tree can at most have two children (connected nodes) and at most one parent. The depth of a node is the number of edges between the node and the root of the tree. Lastly, any node that has no children is called a "leaf" node.
 
 The time complexity of binary tree operations (search, insert, and delete) can occur on an $O(logn)$ time. The $log$ in this notation is base two ($log_2$), as the number of remaining nodes after each step down the tree halves.
@@ -98,20 +96,15 @@ Examples of binary trees include:
 - Binary search trees - Useful for efficient searching and sorting. Search, insert, and delete operations can occur on $O(log(n))$.
 - Heaps - A type of binary tree for priority queues
 
-#### Problems
+### Problems
 700. Search in a Binary Search Tree ([Problem Link](https://leetcode.com/problems/search-in-a-binary-search-tree/description/); [Solution Link](data_structures/04_trees/12_lc700_binary_search_tree.ipynb))
 701. Insert into a Binary Search Tree ([Problem Link](https://leetcode.com/problems/insert-into-a-binary-search-tree/); [Solution Link](data_structures/04_trees/13_lc701_insert_into_bst.ipynb))
 450. Delete Node in a BST ([Problem Link](https://leetcode.com/problems/delete-node-in-a-bst/); [Solution Link](data_structures/04_trees/14_lc450_delete_from_bst.ipynb))
 94. Binary Tree Inorder Traversal ([Problem Link](https://leetcode.com/problems/binary-tree-inorder-traversal/description/); [Solution Link](data_structures/04_trees/15_bst_in_order_traversal.ipynb))
 230. Kth Smallest Element in a BST ([Problem Link](https://leetcode.com/problems/kth-smallest-element-in-a-bst/description/); [Solution Link](data_structures/04_trees/16_lc230_kth_smallest_in_bst.ipynb))
 105. Construct Binary Tree from Preorder and Inorder Traversal ([Problem Link](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/); [Solution Link](data_structures/04_trees/17_lc105_bt_from_preorder_inorder_lists.ipynb))
-
-
-Binary trees, binary search trees, AVL trees, Red-Black trees, segment trees, Fenwick trees (Binary Indexed Trees), trie (prefix tree).
-
-### Depth-First Search
-
-#### Problems
+102. Binary Tree Level Order Traversal ([Problem Link](https://leetcode.com/problems/binary-tree-level-order-traversal/description/);[Solution Link](data_structures/04_trees/18_lc102_bt_level_order_traversal.ipynb))
+199. Binary Tree Right Side View ([Problem Link](https://leetcode.com/problems/binary-tree-right-side-view/); [Solution Link](data_structures/04_trees/19_lc199_bt_right_side_view.ipynb))
 
 
 ## Heaps
