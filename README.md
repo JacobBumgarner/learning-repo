@@ -28,4 +28,5 @@ The goal for these articles that I create is to convert them into Medium posts. 
 
 Please feel free to open an issue if you find anything wrong with the examples or have any suggestions for improvement.
 
-Copyright © 2022 Jacob Bumgarner
+Copyright © 2024 Jacob Bumgarner, Ph.D.
+
