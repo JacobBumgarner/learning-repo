@@ -1,0 +1,31 @@
+---
+title: "Variance"
+format:
+    html:
+        toc: true
+---
+
+## Overview
+
+**Variance** is a quantitative measurement of the *spread* of a set of data
+around the mean of the data.
+
+![Varying Distributions](distributions.png){width=50%}
+
+In descriptive statistics, variance is used to describe the distribution of a
+sample or population. In inferential statistics, variance is a measurement used
+to measure the expected variability of a *random variable^a^*.
+
+:::{.column-margin}
+
+*^a^Random variables* are functions that map sample spaces (e.g., $\{ H, T \}$ is
+the sample space of a coin flip) to a measurable space (e.g., $\{ H: 0, T: 1
+\}$). By definition, a random variable generates values that vary *randomly*
+[@wiki:Random_variable; @psu_stat500]. 
+
+:::
+
+## References
+:::{#refs}
+
+:::
